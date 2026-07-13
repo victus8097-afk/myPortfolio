@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
-/* ============================================================
-   Global Styles — Flat Cartoon / Neo-Brutalism Theme
+/* =====================================================   Global Styles — Flat Cartoon / Neo-Brutalism Theme
    ============================================================ */
 
 @theme {
@@ -54,8 +53,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-brutal-black);
 }
 
-/* ============================================================
-   Background Gradients & Patterns
+/* =====================================================   Background Gradients & Patterns
    ============================================================ */
 
 /* خلفية الجسم الرئيسي — أبيض مع شرائط مائلة */
@@ -97,8 +95,7 @@ body {
   background-size: 40px 40px;
 }
 
-/* ============================================================
-   Neo-Brutalism Components
+/* =====================================================   Neo-Brutalism Components
    ============================================================ */
 
 .brutal-card {
@@ -255,8 +252,7 @@ body {
   }
 }
 
-/* ============================================================
-   Featured projects polish
+/* =====================================================   Featured projects polish
    ============================================================ */
 
 .featured-heading-mark {
@@ -454,8 +450,7 @@ html[dir="rtl"] .featured-projects-cta:hover {
   transform: rotate(-4deg);
 }
 
-/* ============================================================
-   Projects pages polish
+/* =====================================================   Projects pages polish
    ============================================================ */
 
 .projects-page-header {
@@ -553,8 +548,41 @@ html[dir="rtl"] .featured-projects-cta:hover {
   border-bottom: 2px solid rgba(15, 15, 15, 0.1);
 }
 
-/* ============================================================
-   RTL Adjustments
+/* =====================================================   Tools and technologies cards
+   ============================================================ */
+
+.skills-tool-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.skills-tool-card {
+  width: 11rem;
+  height: 4.75rem;
+  padding: 0.75rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 11rem;
+}
+
+@media (max-width: 767px) {
+  .skills-tool-grid {
+    gap: 0.75rem;
+  }
+
+  .skills-tool-card {
+    width: min(10rem, calc(50vw - 2rem));
+    height: 4.25rem;
+    flex-basis: min(10rem, calc(50vw - 2rem));
+    padding-inline: 0.5rem;
+  }
+}
+
+/* =====================================================   RTL Adjustments
    ============================================================ */
 
 [dir="rtl"] .brutal-card { box-shadow: -6px 6px 0px var(--color-brutal-black); }
@@ -564,8 +592,7 @@ html[dir="rtl"] .featured-projects-cta:hover {
 [dir="rtl"] .brutal-skill-cube { box-shadow: -4px 4px 0px var(--color-brutal-black); }
 [dir="rtl"] .brutal-skill-cube:hover { box-shadow: -7px 10px 0px var(--color-brutal-black); }
 
-/* ============================================================
-   Animations
+/* =====================================================   Animations
    ============================================================ */
 
 @keyframes float {

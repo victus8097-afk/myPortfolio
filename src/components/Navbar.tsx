@@ -10,7 +10,7 @@ import { Menu, X } from 'lucide-react';
 
 const navLinks = [
   { label: 'الرئيسية', href: '#hero' },
-  { label: 'المهارات', href: '#skills' },
+  { label: 'الأدوات والتقنيات', href: '#skills' },
   { label: 'المشاريع', href: '#projects' },
 ];
 

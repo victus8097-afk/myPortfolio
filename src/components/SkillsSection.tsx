@@ -1,5 +1,5 @@
 // ============================================================
-// SkillsSection.tsx — قسم المهارات
+// SkillsSection.tsx — قسم الأدوات والتقنيات
 // ============================================================
 
 import type { Skill } from '@/types';
@@ -43,12 +43,14 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
         {/* العنوان */}
         <div className="text-center mb-14">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-brutal-black mb-4">
-            المهارات
+            الأدوات والتقنيات
           </h2>
-          <p className="text-brutal-black/45 text-lg max-w-xl mx-auto">التقنيات والأدوات التي أستخدمها لبناء حلول رقمية مبتكرة</p>
+          <p className="text-brutal-black/45 text-lg max-w-xl mx-auto">
+            الأدوات والتقنيات التي أستخدمها لبناء حلول رقمية متكاملة
+          </p>
         </div>
 
-        {/* المهارات */}
+        {/* مجموعات الأدوات والتقنيات */}
         {categories.map(([category, categorySkills], groupIdx) => {
           const banner = categoryBanners[groupIdx % categoryBanners.length];
 
@@ -62,26 +64,17 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
                 className="relative -left-[5vw] -right-[8vw] w-[100vw] overflow-hidden"
                 style={{ transform: `rotate(${banner.rotate})`, transformOrigin: 'center' }}
               >
-                {/* خلفية المستطيل */}
+                {/* خلفية المجموعة */}
                 <div className={`absolute inset-0 ${banner.bg} border-y-3 border-brutal-black/8`}></div>
 
-                {/* المكعبات */}
-                <div className="relative z-10 py-6 px-4 flex flex-wrap gap-4 justify-center">
+                {/* بطاقات الأدوات — اسم التقنية فقط */}
+                <div className="skills-tool-grid relative z-10 py-6 px-4">
                   {categorySkills.map((skill, idx) => (
                     <div
                       key={skill.id}
-                      className={`brutal-skill-cube ${cubeColors[(groupIdx * 3 + idx) % cubeColors.length]} text-brutal-black text-center`}
+                      className={`brutal-skill-cube skills-tool-card ${cubeColors[(groupIdx * 3 + idx) % cubeColors.length]} text-brutal-black text-center`}
                     >
-                      <span className="text-base font-extrabold">{skill.skill_name}</span>
-                      {skill.skill_tags && skill.skill_tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2 justify-center">
-                          {skill.skill_tags.map((tag) => (
-                            <span key={tag} className="text-xs bg-white/60 px-2 py-0.5 rounded-md border border-brutal-black/15 font-medium">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                      <span className="text-base font-extrabold leading-tight">{skill.skill_name}</span>
                     </div>
                   ))}
                 </div>
@@ -94,7 +87,7 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
           <div className="text-center py-16">
             <div className="brutal-card p-12 max-w-sm mx-auto">
               <span className="text-5xl mb-4 block">🚧</span>
-              <p className="text-lg font-bold text-brutal-black">لا توجد مهارات مضافة بعد</p>
+              <p className="text-lg font-bold text-brutal-black">لا توجد أدوات أو تقنيات مضافة بعد</p>
             </div>
           </div>
         )}
