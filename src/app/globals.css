@@ -466,10 +466,7 @@ html[dir="rtl"] .featured-projects-cta:hover {
 .projects-filter-shell {
   max-width: 58rem;
   margin: 0 auto 2.5rem;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.72);
-  border: 2px solid rgba(15, 15, 15, 0.1);
-  border-radius: 1rem;
+  padding: 0;
 }
 
 .projects-filter-bar {
@@ -486,7 +483,15 @@ html[dir="rtl"] .featured-projects-cta:hover {
 }
 
 .projects-grid > .brutal-card {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+}
+
+.project-card-cover {
+  flex: 0 0 12.5rem;
+  min-height: 12.5rem;
+  height: 12.5rem !important;
 }
 
 .project-card-content {
