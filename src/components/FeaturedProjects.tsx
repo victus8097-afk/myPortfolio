@@ -29,9 +29,6 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
       {/* خلفية — أبيض مع شرائط مائلة */}
       <div className="absolute inset-0 bg-white/70 backdrop-blur-sm"></div>
       <div className="absolute inset-0 stripe-pattern pointer-events-none"></div>
-      <div className="featured-projects-highlight absolute pointer-events-none"></div>
-      <div className="absolute -top-32 -right-32 w-80 h-80 bg-sky/12 rounded-full blur-[100px] pointer-events-none"></div>
-      <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-coral/10 rounded-full blur-[100px] pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* العنوان */}

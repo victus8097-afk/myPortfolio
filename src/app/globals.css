@@ -259,18 +259,6 @@ body {
    Featured projects polish
    ============================================================ */
 
-/* شريط أزرق باهت مستقيم، بنفس أبعاد شريط الهيرو */
-.featured-projects-highlight {
-  top: 55%;
-  left: 50%;
-  width: 140%;
-  height: 360px;
-  transform: translate(-50%, -50%);
-  background: rgba(56, 189, 248, 0.15);
-  border-top: 3px solid rgba(15, 15, 15, 0.08);
-  border-bottom: 3px solid rgba(15, 15, 15, 0.08);
-}
-
 .featured-heading-mark {
   display: flex;
   align-items: center;
@@ -325,12 +313,6 @@ body {
   background: linear-gradient(135deg, var(--color-sky-light), var(--color-mint-light));
   box-shadow: 4px 4px 0 var(--color-brutal-black);
   transform: rotate(-4deg);
-}
-
-@media (max-width: 767px) {
-  .featured-projects-highlight {
-    top: 55%;
-  }
 }
 
 /* ============================================================
