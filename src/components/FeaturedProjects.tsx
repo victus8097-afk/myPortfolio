@@ -70,7 +70,7 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
               return (
                 <div key={project.id} className={`featured-project-item ${placement}`}>
                   <article className="brutal-card brutal-card-hover featured-project-card p-0 overflow-hidden group">
-                    <div className={`h-44 ${idx === 0 ? 'md:h-52' : ''} bg-gradient-to-br ${gradients[idx % 3]} border-b-3 border-brutal-black flex items-center justify-center relative`}>
+                    <div className={`featured-project-card-media bg-gradient-to-br ${gradients[idx % 3]} border-b-3 border-brutal-black flex items-center justify-center relative`}>
                       <span className={`${idx === 0 ? 'text-7xl' : 'text-6xl'} group-hover:scale-110 transition-transform duration-300`}>
                         {config.emoji}
                       </span>
@@ -84,19 +84,19 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                       </span>
                     </div>
 
-                    <div className={`${idx === 0 ? 'p-5' : 'p-4'}`}>
-                      <h3 className={`${idx === 0 ? 'text-xl' : 'text-lg'} font-extrabold text-brutal-black mb-2 group-hover:text-mint-dark transition-colors`}>
+                    <div className={`featured-project-card-body ${idx === 0 ? 'featured-project-card-body-primary' : ''}`}>
+                      <h3 className={`${idx === 0 ? 'text-xl' : 'text-lg'} font-extrabold text-brutal-black mb-2 line-clamp-1 group-hover:text-mint-dark transition-colors`}>
                         {project.title}
                       </h3>
 
                       {project.description && (
-                        <p className="text-brutal-black/50 text-sm mb-4 line-clamp-2 leading-relaxed">
+                        <p className="featured-project-description text-brutal-black/50 text-xs mb-2 line-clamp-1 leading-relaxed">
                           {project.description.substring(0, 100)}...
                         </p>
                       )}
 
                       {project.tags && project.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mb-4">
+                        <div className="featured-project-tags flex flex-wrap gap-1.5 mb-2">
                           {project.tags.slice(0, 4).map((tag) => (
                             <span key={tag} className="brutal-tag bg-brutal-gray text-brutal-black text-xs">
                               {tag}
@@ -110,7 +110,7 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                         </div>
                       )}
 
-                      <Link href={`/projects/${slug}`} className="brutal-btn brutal-btn-warm w-full text-sm">
+                      <Link href={`/projects/${slug}`} className="featured-project-card-button brutal-btn brutal-btn-warm w-full text-sm">
                         عرض التفاصيل ←
                       </Link>
                     </div>

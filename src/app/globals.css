@@ -275,7 +275,7 @@ body {
  */
 .featured-projects-grid {
   width: 100%;
-  max-width: 68rem;
+  max-width: 64rem;
   margin-inline: auto;
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.3fr) minmax(0, 0.85fr);
@@ -304,7 +304,47 @@ body {
 
 .featured-project-card {
   min-width: 0;
-  height: 100%;
+  aspect-ratio: 1 / 1;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.featured-project-card-media {
+  flex: 0 0 43%;
+  min-height: 0;
+}
+
+.featured-project-card-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+}
+
+.featured-project-card-body-primary {
+  padding: 0.75rem;
+}
+
+.featured-project-card-media .brutal-tag {
+  padding: 0.15rem 0.5rem;
+  font-size: 0.65rem;
+}
+
+.featured-project-tags {
+  flex-wrap: nowrap;
+  max-height: 1.75rem;
+  overflow: hidden;
+}
+
+.featured-project-card-button {
+  margin-top: auto;
+  min-height: 2.25rem;
+  padding: 0.45rem 0.65rem;
+  border-width: 2px;
+  font-size: 0.75rem;
 }
 
 .featured-project-rank-wrap {
