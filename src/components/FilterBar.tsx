@@ -32,7 +32,7 @@ export default function FilterBar() {
   };
 
   return (
-    <div className="flex flex-wrap justify-center gap-3 mb-10">
+    <div className="projects-filter-bar flex flex-wrap justify-center gap-3 mb-10">
       {filterOptions.map((option) => (
         <button
           key={option.value}

@@ -454,6 +454,100 @@ html[dir="rtl"] .featured-projects-cta:hover {
 }
 
 /* ============================================================
+   Projects pages polish
+   ============================================================ */
+
+.projects-page-header {
+  max-width: 46rem;
+  margin-inline: auto;
+}
+
+.projects-filter-shell {
+  max-width: 58rem;
+  margin: 0 auto 2.5rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.72);
+  border: 2px solid rgba(15, 15, 15, 0.1);
+  border-radius: 1rem;
+}
+
+.projects-filter-bar {
+  margin-bottom: 0;
+}
+
+.projects-filter-bar .brutal-btn {
+  min-width: 8rem;
+  padding-block: 0.65rem;
+}
+
+.projects-grid {
+  align-items: stretch;
+}
+
+.projects-grid > .brutal-card {
+  height: 100%;
+}
+
+.project-card-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.project-card-content > .brutal-btn {
+  margin-top: auto;
+}
+
+.project-detail-toolbar {
+  padding-bottom: 1.25rem;
+  border-bottom: 2px solid rgba(15, 15, 15, 0.1);
+}
+
+.project-detail-type {
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid var(--color-brutal-black);
+  border-radius: 0.65rem;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.project-detail-type.project-type-mobile {
+  background: var(--color-warm-light);
+}
+
+.project-detail-type.project-type-web {
+  background: var(--color-sky-light);
+}
+
+.project-detail-type.project-type-other {
+  background: #DDD6FE;
+}
+
+.project-detail-header {
+  padding-right: 1rem;
+  border-right: 8px solid var(--color-sky);
+}
+
+.project-detail-header.project-type-mobile {
+  border-right-color: var(--color-warm-dark);
+}
+
+.project-detail-header.project-type-web {
+  border-right-color: var(--color-sky-dark);
+}
+
+.project-detail-header.project-type-other {
+  border-right-color: var(--color-purple-dark);
+}
+
+.project-detail-description h2 {
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(15, 15, 15, 0.1);
+}
+
+/* ============================================================
    RTL Adjustments
    ============================================================ */
 

@@ -18,6 +18,12 @@ interface ProjectDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
+const typeLabels: Record<string, string> = {
+  mobile_app: 'تطبيق جوال',
+  web_app: 'موقع ويب',
+  other: 'عمل آخر',
+};
+
 export async function generateMetadata({ params }: ProjectDetailPageProps) {
   const { slug } = await params;
   const project = await getProjectBySlug(slug);
@@ -50,7 +56,7 @@ async function getProjectBySlug(slug: string) {
 
   if (!project) return null;
 
-  // جلب وسائط المشروع
+  // جلب وسائط المشروع مرتبة من قاعدة البيانات
   const { data: media } = await supabase
     .from('project_media')
     .select('*')
@@ -71,36 +77,37 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
     notFound();
   }
 
+  const typeClass = getProjectTypeClass(project.project_type);
+  const typeLabel = typeLabels[project.project_type] || project.project_type;
+
   return (
-    <main className="min-h-screen bg-brutal-gray">
+    <main className="project-detail-page min-h-screen bg-brutal-gray">
       <Navbar />
 
-      <div className="section-padding pt-24">
-        <div className="max-w-7xl mx-auto">
-          {/* مسار التنقل */}
-          <div className="mb-8">
-            <Link
-              href="/projects"
-              className="brutal-btn bg-white text-sm mb-4"
-            >
+      <div className="section-padding pt-28 pb-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="project-detail-toolbar flex flex-wrap items-center justify-between gap-4 mb-8">
+            <Link href="/projects" className="brutal-btn bg-white text-sm">
               <ArrowRight size={16} />
               العودة للمعرض
             </Link>
+            <span className={`project-detail-type ${typeClass}`}>{typeLabel}</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* العمود الرئيسي — معرض الوسائط + الوصف */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* معرض الوسائط الكرتوني */}
+          <header className={`project-detail-header ${typeClass} mb-10`}>
+            <p className="text-sm font-bold text-[#111111]/45 mb-3">تفاصيل المشروع</p>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#111111] leading-tight">
+              {project.title}
+            </h1>
+          </header>
+
+          <div className="project-detail-layout grid grid-cols-1 lg:grid-cols-[minmax(0,1.55fr)_minmax(18rem,0.75fr)] gap-8 items-start">
+            <div className="space-y-8">
               <MediaSliderWrapper media={project.project_media || []} />
 
-              {/* وصف المشروع التفصيلي */}
               {project.description && (
-                <div className="brutal-card p-6">
-                  <h2
-                    className="text-2xl font-black text-[#111111] mb-4"
-                    style={{ fontFamily: 'var(--font-heading)' }}
-                  >
+                <article className="project-detail-description brutal-card p-6 sm:p-8">
+                  <h2 className="text-2xl font-black text-[#111111] mb-4">
                     عن المشروع
                   </h2>
                   <div
@@ -109,14 +116,13 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                       __html: project.description.replace(/\n/g, '<br/>'),
                     }}
                   />
-                </div>
+                </article>
               )}
             </div>
 
-            {/* العمود الجانبي — البيانات الوصفية */}
-            <div className="space-y-6">
+            <aside className="lg:sticky lg:top-24">
               <ProjectMetaBox project={project} />
-            </div>
+            </aside>
           </div>
         </div>
       </div>
@@ -125,4 +131,10 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
       <ScrollToTop />
     </main>
   );
+}
+
+function getProjectTypeClass(projectType: string): string {
+  if (projectType === 'mobile_app') return 'project-type-mobile';
+  if (projectType === 'web_app') return 'project-type-web';
+  return 'project-type-other';
 }

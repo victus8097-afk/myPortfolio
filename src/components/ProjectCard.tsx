@@ -52,7 +52,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       </div>
 
       {/* محتوى الكرت */}
-      <div className="p-5">
+      <div className="project-card-content p-5">
         <h3
           className="text-lg font-black text-[#111111] mb-1"
           style={{ fontFamily: 'var(--font-heading)' }}

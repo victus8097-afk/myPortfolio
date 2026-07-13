@@ -42,33 +42,34 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   const projects = await getProjects(params.type);
 
   return (
-    <main className="min-h-screen bg-brutal-gray">
+    <main className="projects-page min-h-screen bg-brutal-gray">
       <Navbar />
 
-      <div className="section-padding pt-24">
-        <div className="max-w-7xl mx-auto">
-          {/* العنوان */}
-          <div className="text-center mb-10">
-            <h1
-              className="text-3xl sm:text-4xl font-black text-[#111111] mb-3"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
+      <div className="section-padding pt-28 pb-20">
+        <div className="max-w-6xl mx-auto">
+          <header className="projects-page-header text-center mb-12">
+            <div className="featured-heading-mark mb-5" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#111111] mb-4">
               معرض الأعمال
             </h1>
-            <p className="text-[#111111]/60 text-lg">
+            <p className="text-[#111111]/55 text-base sm:text-lg max-w-xl mx-auto">
               جميع المشاريع والأعمال المنجزة
             </p>
+          </header>
+
+          <div className="projects-filter-shell">
+            <Suspense>
+              <FilterBar />
+            </Suspense>
           </div>
 
-          {/* شريط الفلترة */}
-          <Suspense>
-            <FilterBar />
-          </Suspense>
-
-          {/* شبكة المشاريع */}
           <Suspense fallback={<SkeletonCard type="project" count={6} />}>
             {projects.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="projects-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {projects.map((project) => (
                   <ProjectCard key={project.id} project={project} />
                 ))}
