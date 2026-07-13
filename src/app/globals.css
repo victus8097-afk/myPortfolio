@@ -288,10 +288,10 @@ body {
   max-width: 68rem;
   margin-inline: auto;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr) minmax(0, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-areas: "secondary primary tertiary";
   align-items: stretch;
-  gap: 1.5rem;
+  gap: 1.25rem;
   direction: ltr;
 }
 
@@ -334,10 +334,6 @@ body {
 .featured-project-card-media {
   height: 12.5rem;
   border-bottom-color: var(--project-accent) !important;
-}
-
-.featured-project-card-primary .featured-project-card-media {
-  height: 14rem;
 }
 
 html[dir="rtl"] .featured-project-card {
