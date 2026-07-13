@@ -5,10 +5,10 @@
 // Client Component: محمية بنظام المصادقة
 // ============================================================
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, type ChangeEvent } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import type { Project, Skill, ContactChannel, ProfileSettings, DashboardStats } from '@/types';
+import type { Project, ProjectMedia, Skill, ContactChannel, ProfileSettings, DashboardStats } from '@/types';
 import {
   LayoutDashboard,
   FolderOpen,
@@ -24,7 +24,12 @@ import {
   Star,
   Save,
   X,
+  Upload,
+  Image as ImageIcon,
+  Check,
 } from 'lucide-react';
+
+const MEDIA_BUCKET = 'project-media';
 
 type ActiveTab = 'overview' | 'projects' | 'skills' | 'settings' | 'security';
 
@@ -46,13 +51,13 @@ export default function DashboardPage() {
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   // جلب البيانات
   const fetchData = useCallback(async () => {
     try {
       const [projectsRes, skillsRes, channelsRes, profileRes] = await Promise.all([
-        supabase.from('projects').select('*').order('created_at', { ascending: false }),
+        supabase.from('projects').select('*, project_media(*)').order('created_at', { ascending: false }),
         supabase.from('skills').select('*').order('sort_order', { ascending: true }),
         supabase.from('contact_channels').select('*'),
         supabase.from('profile_settings').select('*').single(),
@@ -70,7 +75,7 @@ export default function DashboardPage() {
       setStats({
         totalProjects: projectData.length,
         totalSkills: skillData.length,
-        totalMedia: 0,
+        totalMedia: projectData.reduce((total, project) => total + (project.project_media?.length || 0), 0),
         activeChannels: channelData.filter((c) => c.is_active).length,
       });
     } catch (error) {
@@ -100,16 +105,16 @@ export default function DashboardPage() {
 
   const tabs: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
     { id: 'overview', label: 'نظرة عامة', icon: <LayoutDashboard size={18} /> },
-    { id: 'projects', label: 'المشاريع', icon: <FolderOpen size={18} /> },
-    { id: 'skills', label: 'المهارات', icon: <Wrench size={18} /> },
+    { id: 'projects', label: 'الأعمال', icon: <FolderOpen size={18} /> },
+    { id: 'skills', label: 'الأدوات والتقنيات', icon: <Wrench size={18} /> },
     { id: 'settings', label: 'الإعدادات', icon: <Settings size={18} /> },
     { id: 'security', label: 'الأمان', icon: <Shield size={18} /> },
   ];
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-brutal-gray flex items-center justify-center">
-        <div className="brutal-card p-8 text-center">
+      <main className="dashboard-shell min-h-screen flex items-center justify-center">
+        <div className="dashboard-loading brutal-card p-8 text-center">
           <div className="text-4xl mb-4 animate-pulse">⏳</div>
           <p className="font-bold text-[#111111]">جاري التحميل...</p>
         </div>
@@ -118,18 +123,18 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-brutal-gray">
+    <main className="dashboard-shell min-h-screen">
       {/* Header */}
-      <header className="bg-white border-b-3 border-[#111111] px-6 py-4 flex items-center justify-between">
+      <header className="dashboard-header px-6 py-4 flex items-center justify-between">
         <h1
           className="text-xl font-black text-[#111111]"
           style={{ fontFamily: 'var(--font-heading)' }}
         >
-          🎛️ لوحة التحكم
+          لوحة التحكم
         </h1>
         <div className="flex items-center gap-3">
           <Link href="/" className="brutal-btn bg-white text-sm">
-            👁️ عرض الموقع
+            عرض الموقع
           </Link>
           <button onClick={handleLogout} className="brutal-btn brutal-btn-red text-sm">
             <LogOut size={16} />
@@ -140,7 +145,8 @@ export default function DashboardPage() {
 
       <div className="flex">
         {/* الشريط الجانبي */}
-        <aside className="w-64 bg-white border-l-3 border-[#111111] min-h-[calc(100vh-64px)] p-4">
+        <aside className="dashboard-sidebar w-64 min-h-[calc(100vh-64px)] p-4">
+          <div className="dashboard-sidebar-title mb-5 px-4">إدارة الموقع</div>
           <nav className="space-y-2">
             {tabs.map((tab) => (
               <button
@@ -148,8 +154,8 @@ export default function DashboardPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm transition-colors ${
                   activeTab === tab.id
-                    ? 'bg-mint text-[#111111] border-2 border-[#111111]'
-                    : 'text-[#111111]/60 hover:bg-gray-100'
+                    ? 'dashboard-tab-active bg-mint text-[#111111] border-2 border-[#111111]'
+                    : 'dashboard-tab-idle text-white/55 hover:bg-white/10 hover:text-white'
                 }`}
               >
                 {tab.icon}
@@ -160,7 +166,7 @@ export default function DashboardPage() {
         </aside>
 
         {/* المحتوى الرئيسي */}
-        <div className="flex-1 p-6">
+        <div className="dashboard-content flex-1 p-6 lg:p-8">
           {activeTab === 'overview' && (
             <OverviewTab stats={stats} />
           )}
@@ -195,19 +201,24 @@ export default function DashboardPage() {
 
 function OverviewTab({ stats }: { stats: DashboardStats }) {
   const statCards = [
-    { label: 'إجمالي المشاريع', value: stats.totalProjects, emoji: '📁', color: 'bg-mint' },
-    { label: 'إجمالي المهارات', value: stats.totalSkills, emoji: '🧩', color: 'bg-sky' },
-    { label: 'الوسائط', value: stats.totalMedia, emoji: '🖼️', color: 'bg-warm' },
-    { label: 'قنوات فعالة', value: stats.activeChannels, emoji: '📡', color: 'bg-purple-300' },
+    { label: 'إجمالي الأعمال', value: stats.totalProjects, icon: <FolderOpen size={22} />, color: 'bg-mint' },
+    { label: 'الأدوات والتقنيات', value: stats.totalSkills, icon: <Wrench size={22} />, color: 'bg-sky' },
+    { label: 'الوسائط', value: stats.totalMedia, icon: <ImageIcon size={22} />, color: 'bg-warm' },
+    { label: 'قنوات فعالة', value: stats.activeChannels, icon: <Settings size={22} />, color: 'bg-purple-300' },
   ];
 
   return (
     <div>
-      <h2 className="text-2xl font-black text-[#111111] mb-6">📊 نظرة عامة</h2>
+      <div className="dashboard-section-heading mb-6">
+        <p className="text-sm font-bold text-[#111111]/45 mb-1">ملخص سريع</p>
+        <h2 className="text-2xl font-black text-[#111111]">نظرة عامة</h2>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card) => (
-          <div key={card.label} className="brutal-card p-6 text-center">
-            <span className="text-3xl mb-2 block">{card.emoji}</span>
+          <div key={card.label} className="dashboard-stat-card brutal-card p-5">
+            <div className={`dashboard-stat-icon ${card.color} w-12 h-12 rounded-xl border-3 border-[#111111] flex items-center justify-center mb-4`}>
+              {card.icon}
+            </div>
             <p className="text-3xl font-black text-[#111111] mb-1">{card.value}</p>
             <p className="text-sm text-[#111111]/60 font-medium">{card.label}</p>
           </div>
@@ -255,7 +266,7 @@ function ProjectsTab({
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-black text-[#111111]">📁 إدارة المشاريع</h2>
+        <h2 className="text-2xl font-black text-[#111111]">إدارة الأعمال</h2>
         <button
           onClick={() => {
             setEditingProject(null);
@@ -275,6 +286,7 @@ function ProjectsTab({
             <tr className="bg-[#111111] text-white">
               <th className="px-4 py-3 text-right font-bold">العنوان</th>
               <th className="px-4 py-3 text-right font-bold">النوع</th>
+              <th className="px-4 py-3 text-center font-bold">الوسائط</th>
               <th className="px-4 py-3 text-center font-bold">ظاهر</th>
               <th className="px-4 py-3 text-center font-bold">مميز</th>
               <th className="px-4 py-3 text-center font-bold">إجراءات</th>
@@ -285,6 +297,9 @@ function ProjectsTab({
               <tr key={project.id} className="border-b-2 border-[#111111]/10 hover:bg-gray-50">
                 <td className="px-4 py-3 font-bold">{project.title}</td>
                 <td className="px-4 py-3">{project.project_type}</td>
+                <td className="px-4 py-3 text-center font-bold text-[#111111]/65">
+                  {project.project_media?.length || 0}
+                </td>
                 <td className="px-4 py-3 text-center">
                   <button onClick={() => toggleVisibility(project)}>
                     {project.is_visible ? <Eye size={16} className="text-mint-dark mx-auto" /> : <EyeOff size={16} className="text-[#111111]/30 mx-auto" />}
@@ -361,33 +376,134 @@ function ProjectFormModal({
     is_visible: project?.is_visible ?? true,
     is_featured: project?.is_featured ?? false,
   });
+  const [mediaItems, setMediaItems] = useState<ProjectMedia[]>(project?.project_media || []);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSave = async () => {
-    setSaving(true);
-    const data = {
-      ...form,
-      tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
-    };
-
-    if (project) {
-      await supabase.from('projects').update(data).eq('id', project.id);
-    } else {
-      await supabase.from('projects').insert(data);
-    }
-
-    setSaving(false);
-    onSaved();
-    onClose();
+  const handleFiles = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []).filter(
+      (file) => file.type.startsWith('image/') || file.type.startsWith('video/')
+    );
+    setPendingFiles((current) => [...current, ...files]);
+    event.target.value = '';
   };
 
+  const uploadFiles = async (projectId: string) => {
+    if (pendingFiles.length === 0) return;
+
+    setUploading(true);
+    try {
+      for (const [index, file] of pendingFiles.entries()) {
+        const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
+        const filePath = `${projectId}/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
+        const { error: uploadError } = await supabase.storage
+          .from(MEDIA_BUCKET)
+          .upload(filePath, file, { contentType: file.type, upsert: false });
+
+        if (uploadError) throw uploadError;
+
+        const { data: publicFile } = supabase.storage
+          .from(MEDIA_BUCKET)
+          .getPublicUrl(filePath);
+        const { error: mediaError } = await supabase.from('project_media').insert({
+          project_id: projectId,
+          media_url: publicFile.publicUrl,
+          media_type: file.type.startsWith('video/') ? 'video' : 'image',
+          sort_order: mediaItems.length + index,
+        });
+
+        if (mediaError) throw mediaError;
+      }
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!form.title.trim()) return;
+
+    setSaving(true);
+    setError('');
+    try {
+      const data = {
+        ...form,
+        title: form.title.trim(),
+        tags: form.tags.split(',').map((tag) => tag.trim()).filter(Boolean),
+      };
+      let projectId = project?.id;
+
+      if (projectId) {
+        const { error: updateError } = await supabase.from('projects').update(data).eq('id', projectId);
+        if (updateError) throw updateError;
+      } else {
+        const { data: createdProject, error: insertError } = await supabase
+          .from('projects')
+          .insert(data)
+          .select('id')
+          .single();
+        if (insertError) throw insertError;
+        projectId = createdProject.id;
+      }
+
+      if (projectId) await uploadFiles(projectId);
+      onSaved();
+      onClose();
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : 'تعذر حفظ العمل أو رفع الوسائط');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSetCover = async (media: ProjectMedia) => {
+    if (!project) {
+      setError('احفظ العمل أولاً حتى تتمكن من تحديد الغلاف');
+      return;
+    }
+
+    const ordered = [media, ...mediaItems.filter((item) => item.id !== media.id)];
+    const results = await Promise.all(
+      ordered.map((item, index) =>
+        supabase.from('project_media').update({ sort_order: index }).eq('id', item.id)
+      )
+    );
+    const failed = results.find((result) => result.error);
+    if (failed?.error) {
+      setError(failed.error.message);
+      return;
+    }
+    setMediaItems(ordered.map((item, index) => ({ ...item, sort_order: index })));
+  };
+
+  const handleDeleteMedia = async (media: ProjectMedia) => {
+    if (!confirm('هل تريد حذف هذه الوسيطة؟')) return;
+
+    const storagePath = getStoragePath(media.media_url);
+    if (storagePath) {
+      await supabase.storage.from(MEDIA_BUCKET).remove([storagePath]);
+    }
+    const { error: deleteError } = await supabase.from('project_media').delete().eq('id', media.id);
+    if (deleteError) {
+      setError(deleteError.message);
+      return;
+    }
+    setMediaItems((items) => items.filter((item) => item.id !== media.id));
+  };
+
+  const orderedMedia = [...mediaItems].sort((a, b) => a.sort_order - b.sort_order);
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="brutal-card p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+    <div className="dashboard-modal fixed inset-0 bg-black/55 flex items-center justify-center z-50 p-4">
+      <div className="dashboard-modal-card brutal-card p-6 max-w-2xl w-full max-h-[92vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-black text-[#111111]">
-            {project ? '✏️ تعديل مشروع' : '➕ إضافة مشروع جديد'}
-          </h3>
+          <div>
+            <p className="text-xs font-bold text-[#111111]/45 mb-1">إدارة الأعمال</p>
+            <h3 className="text-xl font-black text-[#111111]">
+              {project ? 'تعديل العمل' : 'إضافة عمل جديد'}
+            </h3>
+          </div>
           <button onClick={onClose} className="p-1.5 rounded-lg border-2 border-[#111111] hover:bg-gray-100">
             <X size={16} />
           </button>
@@ -395,12 +511,12 @@ function ProjectFormModal({
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-bold mb-1">عنوان المشروع *</label>
+            <label className="block text-sm font-bold mb-1">عنوان العمل *</label>
             <input
               value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              onChange={(event) => setForm({ ...form, title: event.target.value })}
               className="brutal-input"
-              placeholder="اسم المشروع"
+              placeholder="اسم العمل"
             />
           </div>
 
@@ -408,17 +524,17 @@ function ProjectFormModal({
             <label className="block text-sm font-bold mb-1">الوصف</label>
             <textarea
               value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              onChange={(event) => setForm({ ...form, description: event.target.value })}
               className="brutal-input min-h-[100px]"
-              placeholder="وصف تفصيلي للمشروع"
+              placeholder="وصف مختصر وواضح للعمل"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-1">نوع المشروع</label>
+            <label className="block text-sm font-bold mb-1">نوع العمل</label>
             <select
               value={form.project_type}
-              onChange={(e) => setForm({ ...form, project_type: e.target.value })}
+              onChange={(event) => setForm({ ...form, project_type: event.target.value })}
               className="brutal-input"
             >
               <option value="web_app">موقع ويب</option>
@@ -428,44 +544,45 @@ function ProjectFormModal({
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-1">التقنيات (مفصولة بفواصل)</label>
+            <label className="block text-sm font-bold mb-1">التقنيات</label>
             <input
               value={form.tags}
-              onChange={(e) => setForm({ ...form, tags: e.target.value })}
+              onChange={(event) => setForm({ ...form, tags: event.target.value })}
               className="brutal-input"
               placeholder="React, Next.js, TypeScript"
               dir="ltr"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-bold mb-1">الرابط الحي</label>
-            <input
-              value={form.live_url}
-              onChange={(e) => setForm({ ...form, live_url: e.target.value })}
-              className="brutal-input"
-              placeholder="https://"
-              dir="ltr"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-bold mb-1">الرابط الحي</label>
+              <input
+                value={form.live_url}
+                onChange={(event) => setForm({ ...form, live_url: event.target.value })}
+                className="brutal-input"
+                placeholder="https://"
+                dir="ltr"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-1">رابط المتجر</label>
+              <input
+                value={form.store_url}
+                onChange={(event) => setForm({ ...form, store_url: event.target.value })}
+                className="brutal-input"
+                placeholder="https://"
+                dir="ltr"
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-bold mb-1">رابط المتجر</label>
-            <input
-              value={form.store_url}
-              onChange={(e) => setForm({ ...form, store_url: e.target.value })}
-              className="brutal-input"
-              placeholder="https://"
-              dir="ltr"
-            />
-          </div>
-
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={form.is_visible}
-                onChange={(e) => setForm({ ...form, is_visible: e.target.checked })}
+                onChange={(event) => setForm({ ...form, is_visible: event.target.checked })}
                 className="w-4 h-4"
               />
               <span className="text-sm font-bold">ظاهر للعامة</span>
@@ -474,25 +591,97 @@ function ProjectFormModal({
               <input
                 type="checkbox"
                 checked={form.is_featured}
-                onChange={(e) => setForm({ ...form, is_featured: e.target.checked })}
+                onChange={(event) => setForm({ ...form, is_featured: event.target.checked })}
                 className="w-4 h-4"
               />
-              <span className="text-sm font-bold">مشروع مميز ⭐</span>
+              <span className="text-sm font-bold">يظهر ضمن الأعمال البارزة</span>
             </label>
           </div>
 
+          {/* رفع الصور والفيديوهات واختيار الغلاف */}
+          <div className="dashboard-media-panel">
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div>
+                <h4 className="font-black text-[#111111]">الصور والفيديوهات</h4>
+                <p className="text-xs text-[#111111]/50 mt-1">أول وسيطة بترتيب صفر تستخدم كغلاف للعمل.</p>
+              </div>
+              <span className="dashboard-media-count">{mediaItems.length} وسائط</span>
+            </div>
+
+            <label className="dashboard-upload-zone">
+              <Upload size={22} />
+              <span className="font-bold">اختر صوراً أو فيديوهات</span>
+              <span className="text-xs text-[#111111]/50">يمكنك اختيار أكثر من ملف في نفس الوقت</span>
+              <input type="file" accept="image/*,video/*" multiple onChange={handleFiles} className="sr-only" />
+            </label>
+
+            {pendingFiles.length > 0 && (
+              <div className="mt-3 space-y-2">
+                <p className="text-xs font-bold text-[#111111]/55">ملفات جاهزة للرفع</p>
+                {pendingFiles.map((file, index) => (
+                  <div key={`${file.name}-${index}`} className="flex items-center justify-between gap-3 bg-white border-2 border-[#111111]/10 rounded-lg px-3 py-2 text-sm">
+                    <span className="truncate" dir="ltr">{file.name}</span>
+                    <button type="button" onClick={() => setPendingFiles((items) => items.filter((_, itemIndex) => itemIndex !== index))} className="text-brutal-red font-bold">
+                      حذف
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {project && orderedMedia.length > 0 && (
+              <div className="dashboard-media-grid mt-4">
+                {orderedMedia.map((media) => (
+                  <div key={media.id} className="dashboard-media-item">
+                    <div className="dashboard-media-preview">
+                      {media.media_type === 'image' ? (
+                        <img src={media.media_url} alt="وسائط العمل" />
+                      ) : (
+                        <video src={media.media_url} muted preload="metadata" />
+                      )}
+                      {media.sort_order === 0 && <span className="dashboard-cover-badge">الغلاف</span>}
+                    </div>
+                    <div className="flex items-center justify-between gap-2 mt-2">
+                      <button
+                        type="button"
+                        onClick={() => handleSetCover(media)}
+                        disabled={media.sort_order === 0}
+                        className="text-xs font-bold text-[#111111] disabled:opacity-40"
+                      >
+                        {media.sort_order === 0 ? <Check size={14} className="inline ml-1" /> : 'تعيين كغلاف'}
+                      </button>
+                      <button type="button" onClick={() => handleDeleteMedia(media)} className="text-xs font-bold text-brutal-red">
+                        حذف
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!project && <p className="text-xs text-[#111111]/45 mt-3">سيتم رفع الملفات بعد حفظ العمل لأول مرة.</p>}
+          </div>
+
+          {error && <p className="dashboard-form-error">{error}</p>}
+
           <button
             onClick={handleSave}
-            disabled={saving || !form.title}
+            disabled={saving || uploading || !form.title.trim()}
             className="brutal-btn brutal-btn-mint w-full"
           >
             <Save size={16} />
-            {saving ? '⏳ جاري الحفظ...' : '💾 حفظ المشروع'}
+            {saving || uploading ? 'جاري الحفظ والرفع...' : 'حفظ العمل'}
           </button>
         </div>
       </div>
     </div>
   );
+}
+
+function getStoragePath(url: string): string | null {
+  const marker = `/storage/v1/object/public/${MEDIA_BUCKET}/`;
+  const markerIndex = url.indexOf(marker);
+  return markerIndex === -1 ? null : decodeURIComponent(url.slice(markerIndex + marker.length));
 }
 
 function SkillsTab({ skills, onRefresh }: { skills: Skill[]; onRefresh: () => void }) {
