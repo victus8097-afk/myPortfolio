@@ -8,11 +8,11 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { ProjectType } from '@/types';
 
-const filterOptions: { label: string; value: ProjectType | 'all'; emoji: string }[] = [
-  { label: 'كل الأعمال', value: 'all', emoji: '🎯' },
-  { label: 'تطبيقات جوال', value: 'mobile_app', emoji: '📱' },
-  { label: 'مواقع ويب', value: 'web_app', emoji: '🌐' },
-  { label: 'أعمال أخرى', value: 'other', emoji: '🎨' },
+const filterOptions: { label: string; value: ProjectType | 'all' }[] = [
+  { label: 'كل الأعمال', value: 'all' },
+  { label: 'تطبيقات جوال', value: 'mobile_app' },
+  { label: 'مواقع ويب', value: 'web_app' },
+  { label: 'أعمال أخرى', value: 'other' },
 ];
 
 export default function FilterBar() {
@@ -43,7 +43,6 @@ export default function FilterBar() {
               : 'bg-white hover:bg-gray-50'
           }`}
         >
-          <span>{option.emoji}</span>
           {option.label}
         </button>
       ))}

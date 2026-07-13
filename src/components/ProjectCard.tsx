@@ -10,6 +10,12 @@ interface ProjectCardProps {
   project: Project;
 }
 
+const typeLabel: Record<string, string> = {
+  mobile_app: 'تطبيق جوال',
+  web_app: 'موقع ويب',
+  other: 'عمل آخر',
+};
+
 export default function ProjectCard({ project }: ProjectCardProps) {
   const slug = project.title
     .toLowerCase()
@@ -17,27 +23,24 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .trim();
-
-  const typeEmoji: Record<string, string> = {
-    mobile_app: '📱',
-    web_app: '🌐',
-    other: '🎨',
-  };
-
-  const typeLabel: Record<string, string> = {
-    mobile_app: 'تطبيق جوال',
-    web_app: 'موقع ويب',
-    other: 'عمل آخر',
-  };
+  const coverImage = getCoverImage(project);
 
   return (
-    <div className="brutal-card p-0 overflow-hidden">
-      {/* صورة الغلاف */}
-      <div className="h-48 bg-gradient-to-br from-sky/20 to-mint/20 border-b-3 border-[#111111] flex items-center justify-center relative">
-        <span className="text-7xl">{typeEmoji[project.project_type] || '💻'}</span>
+    <div className="brutal-card p-0 overflow-hidden group">
+      {/* صورة الغلاف من project_media في قاعدة البيانات */}
+      <div className="h-48 bg-gradient-to-br from-sky/20 to-mint/20 border-b-3 border-[#111111] flex items-center justify-center relative overflow-hidden">
+        {coverImage ? (
+          <img
+            src={coverImage}
+            alt={`صورة مشروع ${project.title}`}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : (
+          <span className="text-sm font-bold text-[#111111]/45">لا توجد صورة مضافة</span>
+        )}
         {project.is_featured && (
           <span className="absolute top-3 right-3 brutal-tag bg-warm text-[#111111] rotate-3">
-            ⭐ مميز
+            مميز
           </span>
         )}
       </div>
@@ -81,5 +84,13 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         </Link>
       </div>
     </div>
+  );
+}
+
+function getCoverImage(project: Project): string | null {
+  return (
+    project.project_media
+      ?.filter((media) => media.media_type === 'image' && media.media_url.trim().length > 0)
+      .sort((a, b) => a.sort_order - b.sort_order)[0]?.media_url || null
   );
 }

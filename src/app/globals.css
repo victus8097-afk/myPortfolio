@@ -311,6 +311,22 @@ body {
   margin-top: auto;
 }
 
+.featured-project-no-image {
+  color: rgba(15, 15, 15, 0.45);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.featured-empty-mark {
+  width: 3.5rem;
+  height: 3.5rem;
+  border: 3px solid var(--color-brutal-black);
+  border-radius: 1rem;
+  background: linear-gradient(135deg, var(--color-sky-light), var(--color-mint-light));
+  box-shadow: 4px 4px 0 var(--color-brutal-black);
+  transform: rotate(-4deg);
+}
+
 @media (max-width: 767px) {
   .featured-projects-highlight {
     top: 48%;

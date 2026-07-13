@@ -9,10 +9,10 @@ interface FeaturedProjectsProps {
   projects: Project[];
 }
 
-const typeConfig: Record<string, { emoji: string; color: string; label: string }> = {
-  mobile_app: { emoji: '📱', color: 'bg-warm', label: 'تطبيق جوال' },
-  web_app: { emoji: '🌐', color: 'bg-sky', label: 'موقع ويب' },
-  other: { emoji: '🎨', color: 'bg-purple', label: 'عمل آخر' },
+const typeConfig: Record<string, { color: string; label: string }> = {
+  mobile_app: { color: 'bg-warm', label: 'تطبيق جوال' },
+  web_app: { color: 'bg-sky', label: 'موقع ويب' },
+  other: { color: 'bg-purple', label: 'عمل آخر' },
 };
 
 const gradients = [
@@ -47,22 +47,24 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
           <p className="text-brutal-black/45 text-lg max-w-xl mx-auto">نماذج من أفضل المشاريع التي أنجزتها</p>
         </div>
 
-        {/* كروت */}
+        {/* كروت المشاريع */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {featured.map((project, idx) => {
             const config = typeConfig[project.project_type] || typeConfig.other;
+            const coverImage = getCoverImage(project);
             const slug = generateSlug(project.title);
 
             return (
               <article key={project.id} className="brutal-card brutal-card-hover featured-project-card p-0 overflow-hidden group">
-                <div className={`h-52 bg-gradient-to-br ${gradients[idx % 3]} border-b-3 border-brutal-black flex items-center justify-center relative`}>
-                  <span className="text-7xl group-hover:scale-110 transition-transform duration-300">
-                    {config.emoji}
-                  </span>
-                  {project.is_featured && (
-                    <span className="absolute top-3 right-3 brutal-tag bg-warm text-brutal-black rotate-3 animate-wiggle">
-                      ⭐ مميز
-                    </span>
+                <div className={`h-52 bg-gradient-to-br ${gradients[idx % 3]} border-b-3 border-brutal-black flex items-center justify-center relative overflow-hidden`}>
+                  {coverImage ? (
+                    <img
+                      src={coverImage}
+                      alt={`صورة مشروع ${project.title}`}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="featured-project-no-image">لا توجد صورة مضافة</div>
                   )}
                   <span className={`absolute bottom-3 left-3 brutal-tag ${config.color} text-brutal-black`}>
                     {config.label}
@@ -107,7 +109,7 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
         {featured.length === 0 && (
           <div className="text-center py-16">
             <div className="brutal-card p-12 max-w-sm mx-auto">
-              <span className="text-5xl mb-4 block">🚧</span>
+              <div className="featured-empty-mark mx-auto mb-5" aria-hidden="true"></div>
               <p className="text-lg font-bold text-brutal-black">لا توجد مشاريع مميزة بعد</p>
             </div>
           </div>
@@ -116,12 +118,20 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
         {featured.length > 0 && (
           <div className="text-center mt-12">
             <Link href="/projects" className="brutal-btn brutal-btn-dark text-base px-8 py-3">
-              🎯 استعرض كل المشاريع
+              استعرض كل المشاريع
             </Link>
           </div>
         )}
       </div>
     </section>
+  );
+}
+
+function getCoverImage(project: Project): string | null {
+  return (
+    project.project_media
+      ?.filter((media) => media.media_type === 'image' && media.media_url.trim().length > 0)
+      .sort((a, b) => a.sort_order - b.sort_order)[0]?.media_url || null
   );
 }
 

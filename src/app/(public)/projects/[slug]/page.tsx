@@ -101,7 +101,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                     className="text-2xl font-black text-[#111111] mb-4"
                     style={{ fontFamily: 'var(--font-heading)' }}
                   >
-                    📝 عن المشروع
+                    عن المشروع
                   </h2>
                   <div
                     className="prose prose-lg max-w-none text-[#111111]/80 leading-relaxed"

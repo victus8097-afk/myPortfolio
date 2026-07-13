@@ -23,7 +23,7 @@ async function getProjects(type?: string) {
 
   let query = supabase
     .from('projects')
-    .select('*')
+    .select('*, project_media(*)')
     .eq('is_visible', true)
     .order('is_featured', { ascending: false })
     .order('created_at', { ascending: false });
@@ -53,7 +53,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
               className="text-3xl sm:text-4xl font-black text-[#111111] mb-3"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
-              🎨 معرض الأعمال
+              معرض الأعمال
             </h1>
             <p className="text-[#111111]/60 text-lg">
               جميع المشاريع والأعمال المنجزة
@@ -76,7 +76,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
             ) : (
               <div className="text-center py-20">
                 <div className="brutal-card p-12 max-w-md mx-auto">
-                  <span className="text-6xl mb-4 block">📭</span>
+                  <div className="featured-empty-mark mx-auto mb-5" aria-hidden="true"></div>
                   <h3 className="text-xl font-bold text-[#111111] mb-2">
                     لا توجد مشاريع حالياً
                   </h3>

@@ -11,9 +11,9 @@ interface ProjectMetaBoxProps {
 }
 
 const typeLabels: Record<string, string> = {
-  mobile_app: '📱 تطبيق جوال',
-  web_app: '🌐 موقع ويب',
-  other: '🎨 عمل آخر',
+  mobile_app: 'تطبيق جوال',
+  web_app: 'موقع ويب',
+  other: 'عمل آخر',
 };
 
 export default function ProjectMetaBox({ project }: ProjectMetaBoxProps) {
@@ -23,7 +23,7 @@ export default function ProjectMetaBox({ project }: ProjectMetaBoxProps) {
         className="text-lg font-black text-[#111111] mb-4"
         style={{ fontFamily: 'var(--font-heading)' }}
       >
-        📋 تفاصيل المشروع
+        تفاصيل المشروع
       </h3>
 
       <div className="space-y-4">

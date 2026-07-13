@@ -22,7 +22,7 @@ export default function MediaSlider({ media }: MediaSliderProps) {
   if (!media || media.length === 0) {
     return (
       <div className="brutal-card h-64 flex items-center justify-center bg-brutal-gray">
-        <span className="text-6xl">🖼️</span>
+        <div className="w-16 h-16 rounded-2xl border-3 border-[#111111] bg-white shadow-[4px_4px_0px_#111111]" aria-label="لا توجد وسائط" />
       </div>
     );
   }
