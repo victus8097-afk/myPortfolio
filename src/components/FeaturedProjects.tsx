@@ -36,11 +36,6 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
       <div className="absolute inset-0 bg-white/70 backdrop-blur-sm"></div>
       <div className="absolute inset-0 stripe-pattern pointer-events-none"></div>
 
-      {/* شريط أزرق باهت ممتد من طرف الشاشة إلى الطرف الآخر، بدون ميلان */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="featured-projects-band absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
-      </div>
-
       <div className="absolute -top-32 -right-32 w-80 h-80 bg-sky/12 rounded-full blur-[100px] pointer-events-none"></div>
       <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-coral/10 rounded-full blur-[100px] pointer-events-none"></div>
 
@@ -53,78 +48,83 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
           <p className="text-brutal-black/45 text-lg max-w-xl mx-auto">نماذج من أفضل المشاريع التي أنجزتها</p>
         </div>
 
-        {/* البطاقات: الأول في الوسط بحجم أكبر، الثاني يساره، والثالث في الجهة الأخرى */}
+        {/* المستطيل الأزرق الباهت — يحتوي البطاقات وشارات ترتيبها بالكامل */}
         {featured.length > 0 && (
-          <div className="featured-projects-grid">
-            {featured.map((project, idx) => {
-              const config = typeConfig[project.project_type] || typeConfig.other;
-              const rank = ranks[idx];
-              const slug = generateSlug(project.title);
-              const placement =
-                idx === 0
-                  ? 'featured-project-item-primary'
-                  : idx === 1
-                    ? 'featured-project-item-secondary'
-                    : 'featured-project-item-tertiary';
+          <div className="featured-projects-band">
+            <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-10">
+              {/* البطاقات: الأول في الوسط بحجم أكبر، الثاني يساره، والثالث في الجهة الأخرى */}
+              <div className="featured-projects-grid">
+                {featured.map((project, idx) => {
+                  const config = typeConfig[project.project_type] || typeConfig.other;
+                  const rank = ranks[idx];
+                  const slug = generateSlug(project.title);
+                  const placement =
+                    idx === 0
+                      ? 'featured-project-item-primary'
+                      : idx === 1
+                        ? 'featured-project-item-secondary'
+                        : 'featured-project-item-tertiary';
 
-              return (
-                <div key={project.id} className={`featured-project-item ${placement}`}>
-                  <article className="brutal-card brutal-card-hover featured-project-card p-0 overflow-hidden group">
-                    <div className={`h-52 ${idx === 0 ? 'md:h-64' : ''} bg-gradient-to-br ${gradients[idx % 3]} border-b-3 border-brutal-black flex items-center justify-center relative`}>
-                      <span className={`${idx === 0 ? 'text-8xl' : 'text-7xl'} group-hover:scale-110 transition-transform duration-300`}>
-                        {config.emoji}
-                      </span>
-                      {project.is_featured && (
-                        <span className="absolute top-3 right-3 brutal-tag bg-warm text-brutal-black rotate-3 animate-wiggle">
-                          ⭐ مميز
-                        </span>
-                      )}
-                      <span className={`absolute bottom-3 left-3 brutal-tag ${config.color} text-brutal-black`}>
-                        {config.label}
-                      </span>
-                    </div>
-
-                    <div className={`${idx === 0 ? 'p-7' : 'p-6'}`}>
-                      <h3 className={`${idx === 0 ? 'text-2xl' : 'text-xl'} font-extrabold text-brutal-black mb-2 group-hover:text-mint-dark transition-colors`}>
-                        {project.title}
-                      </h3>
-
-                      {project.description && (
-                        <p className="text-brutal-black/50 text-sm mb-5 line-clamp-2 leading-relaxed">
-                          {project.description.substring(0, 120)}...
-                        </p>
-                      )}
-
-                      {project.tags && project.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mb-5">
-                          {project.tags.slice(0, 4).map((tag) => (
-                            <span key={tag} className="brutal-tag bg-brutal-gray text-brutal-black text-xs">
-                              {tag}
-                            </span>
-                          ))}
-                          {project.tags.length > 4 && (
-                            <span className="brutal-tag bg-brutal-gray text-brutal-black/40 text-xs">
-                              +{project.tags.length - 4}
+                  return (
+                    <div key={project.id} className={`featured-project-item ${placement}`}>
+                      <article className="brutal-card brutal-card-hover featured-project-card p-0 overflow-hidden group">
+                        <div className={`h-44 ${idx === 0 ? 'md:h-52' : ''} bg-gradient-to-br ${gradients[idx % 3]} border-b-3 border-brutal-black flex items-center justify-center relative`}>
+                          <span className={`${idx === 0 ? 'text-7xl' : 'text-6xl'} group-hover:scale-110 transition-transform duration-300`}>
+                            {config.emoji}
+                          </span>
+                          {project.is_featured && (
+                            <span className="absolute top-3 right-3 brutal-tag bg-warm text-brutal-black rotate-3 animate-wiggle">
+                              ⭐ مميز
                             </span>
                           )}
+                          <span className={`absolute bottom-3 left-3 brutal-tag ${config.color} text-brutal-black`}>
+                            {config.label}
+                          </span>
                         </div>
-                      )}
 
-                      <Link href={`/projects/${slug}`} className="brutal-btn brutal-btn-warm w-full text-sm">
-                        عرض التفاصيل ←
-                      </Link>
+                        <div className={`${idx === 0 ? 'p-6' : 'p-5'}`}>
+                          <h3 className={`${idx === 0 ? 'text-xl' : 'text-lg'} font-extrabold text-brutal-black mb-2 group-hover:text-mint-dark transition-colors`}>
+                            {project.title}
+                          </h3>
+
+                          {project.description && (
+                            <p className="text-brutal-black/50 text-sm mb-4 line-clamp-2 leading-relaxed">
+                              {project.description.substring(0, 100)}...
+                            </p>
+                          )}
+
+                          {project.tags && project.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 mb-4">
+                              {project.tags.slice(0, 4).map((tag) => (
+                                <span key={tag} className="brutal-tag bg-brutal-gray text-brutal-black text-xs">
+                                  {tag}
+                                </span>
+                              ))}
+                              {project.tags.length > 4 && (
+                                <span className="brutal-tag bg-brutal-gray text-brutal-black/40 text-xs">
+                                  +{project.tags.length - 4}
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          <Link href={`/projects/${slug}`} className="brutal-btn brutal-btn-warm w-full text-sm">
+                            عرض التفاصيل ←
+                          </Link>
+                        </div>
+                      </article>
+
+                      {/* شارة ترتيب المشروع أسفل البطاقة وداخل المستطيل الأزرق */}
+                      <div className="featured-project-rank-wrap">
+                        <span className={`brutal-tag ${rank.color} text-brutal-black`}>
+                          {rank.emoji} {rank.label}
+                        </span>
+                      </div>
                     </div>
-                  </article>
-
-                  {/* شارة ترتيب المشروع أسفل البطاقة */}
-                  <div className="featured-project-rank-wrap">
-                    <span className={`brutal-tag ${rank.color} text-brutal-black`}>
-                      {rank.emoji} {rank.label}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+                  );
+                })}
+              </div>
+            </div>
           </div>
         )}
 

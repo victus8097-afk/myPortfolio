@@ -259,10 +259,13 @@ body {
    Featured projects arrangement
    ============================================================ */
 
-/* شريط أفقي باهت مثل شريط الهيرو، لكنه مستقيم وغير مائل */
+/* شريط أزرق باهت مستقيم وممتد بعرض الشاشة، وتكون البطاقات داخله */
 .featured-projects-band {
-  width: 140%;
-  height: 360px;
+  position: relative;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  padding: 2rem 0 2.25rem;
   background: rgba(56, 189, 248, 0.15);
   border-top: 3px solid rgba(15, 15, 15, 0.08);
   border-bottom: 3px solid rgba(15, 15, 15, 0.08);
@@ -278,7 +281,7 @@ body {
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.3fr) minmax(0, 0.85fr);
   grid-template-areas: "secondary primary tertiary";
   align-items: end;
-  gap: 1.5rem;
+  gap: 1.25rem;
   direction: ltr;
 }
 
@@ -307,7 +310,7 @@ body {
 .featured-project-rank-wrap {
   display: flex;
   justify-content: center;
-  margin-top: 1rem;
+  margin-top: 0.75rem;
 }
 
 @media (max-width: 1023px) {
@@ -321,8 +324,7 @@ body {
 
 @media (max-width: 767px) {
   .featured-projects-band {
-    height: 75%;
-    min-height: 700px;
+    padding: 1.25rem 0 1.5rem;
   }
 
   .featured-projects-grid {
@@ -331,7 +333,7 @@ body {
       "primary"
       "secondary"
       "tertiary";
-    gap: 1.5rem;
+    gap: 1.25rem;
   }
 }
 
