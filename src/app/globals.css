@@ -259,60 +259,79 @@ body {
    Featured projects arrangement
    ============================================================ */
 
+/* شريط أفقي باهت مثل شريط الهيرو، لكنه مستقيم وغير مائل */
+.featured-projects-band {
+  width: 140%;
+  height: 360px;
+  background: rgba(56, 189, 248, 0.15);
+  border-top: 3px solid rgba(15, 15, 15, 0.08);
+  border-bottom: 3px solid rgba(15, 15, 15, 0.08);
+}
+
 /*
- * Keep the stage direction LTR so the named grid areas stay physically
- * consistent: the second card is on the right and the third is on the left.
- * Each card restores RTL for its Arabic content.
+ * Keep the grid direction LTR so the physical positions are stable:
+ * the second project is on the left, the first is in the center, and the
+ * third is on the right. Each item restores RTL for its Arabic content.
  */
-.featured-projects-stage {
+.featured-projects-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-areas:
-    "primary primary"
-    "tertiary secondary";
-  gap: 2rem;
-  padding: clamp(1.25rem, 3vw, 3rem);
-  background: var(--color-sky);
-  border: 3px solid var(--color-brutal-black);
-  border-radius: 2rem;
-  box-shadow: 10px 10px 0 var(--color-brutal-black);
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.3fr) minmax(0, 0.85fr);
+  grid-template-areas: "secondary primary tertiary";
+  align-items: end;
+  gap: 1.5rem;
   direction: ltr;
 }
 
-.featured-project-card {
+.featured-project-item {
   direction: rtl;
   min-width: 0;
 }
 
-.featured-project-card-primary {
+.featured-project-item-primary {
   grid-area: primary;
-  width: min(100%, 42rem);
-  justify-self: center;
 }
 
-.featured-project-card-secondary {
+.featured-project-item-secondary {
   grid-area: secondary;
 }
 
-.featured-project-card-tertiary {
+.featured-project-item-tertiary {
   grid-area: tertiary;
 }
 
+.featured-project-card {
+  min-width: 0;
+  height: 100%;
+}
+
+.featured-project-rank-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+@media (max-width: 1023px) {
+  .featured-projects-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "primary primary"
+      "secondary tertiary";
+  }
+}
+
 @media (max-width: 767px) {
-  .featured-projects-stage {
+  .featured-projects-band {
+    height: 75%;
+    min-height: 700px;
+  }
+
+  .featured-projects-grid {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
       "primary"
       "secondary"
       "tertiary";
     gap: 1.5rem;
-    padding: 1rem;
-    border-radius: 1.5rem;
-    box-shadow: 6px 6px 0 var(--color-brutal-black);
-  }
-
-  .featured-project-card-primary {
-    width: 100%;
   }
 }
 
