@@ -24,11 +24,17 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     .replace(/-+/g, '-')
     .trim();
   const coverImage = getCoverImage(project);
+  const typeCardClass =
+    project.project_type === 'mobile_app'
+      ? 'project-card-type-mobile'
+      : project.project_type === 'web_app'
+        ? 'project-card-type-web'
+        : 'project-card-type-other';
 
   return (
-    <div className="brutal-card p-0 overflow-hidden group">
+    <div className={`brutal-card brutal-card-hover ${typeCardClass} p-0 overflow-hidden group`}>
       {/* صورة الغلاف من project_media في قاعدة البيانات */}
-      <div className="h-48 bg-gradient-to-br from-sky/20 to-mint/20 border-b-3 border-[#111111] flex items-center justify-center relative overflow-hidden">
+      <div className="project-card-cover h-48 bg-gradient-to-br from-sky/20 to-mint/20 border-b-3 border-[#111111] flex items-center justify-center relative overflow-hidden">
         {coverImage ? (
           <img
             src={coverImage}

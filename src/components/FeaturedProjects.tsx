@@ -9,17 +9,26 @@ interface FeaturedProjectsProps {
   projects: Project[];
 }
 
-const typeConfig: Record<string, { color: string; label: string }> = {
-  mobile_app: { color: 'bg-warm', label: 'تطبيق جوال' },
-  web_app: { color: 'bg-sky', label: 'موقع ويب' },
-  other: { color: 'bg-purple', label: 'عمل آخر' },
+const typeConfig: Record<string, { color: string; label: string; cardClass: string; gradient: string }> = {
+  mobile_app: {
+    color: 'bg-warm',
+    label: 'تطبيق جوال',
+    cardClass: 'featured-project-card-mobile',
+    gradient: 'from-warm/35 to-coral/20',
+  },
+  web_app: {
+    color: 'bg-sky',
+    label: 'موقع ويب',
+    cardClass: 'featured-project-card-web',
+    gradient: 'from-sky/35 to-purple/20',
+  },
+  other: {
+    color: 'bg-purple',
+    label: 'عمل آخر',
+    cardClass: 'featured-project-card-other',
+    gradient: 'from-purple/35 to-mint/20',
+  },
 };
-
-const gradients = [
-  'from-mint/25 to-sky/20',
-  'from-sky/25 to-purple/20',
-  'from-warm/25 to-coral/20',
-];
 
 export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
   const featured = projects.filter((p) => p.is_featured).slice(0, 3);
@@ -44,16 +53,22 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
           <p className="text-brutal-black/45 text-lg max-w-xl mx-auto">نماذج من أفضل المشاريع التي أنجزتها</p>
         </div>
 
-        {/* كروت المشاريع */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* كروت المشاريع — الأول في الوسط بحجم أكبر، ثم الثاني يساراً والثالث يميناً */}
+        <div className="featured-projects-grid">
           {featured.map((project, idx) => {
             const config = typeConfig[project.project_type] || typeConfig.other;
             const coverImage = getCoverImage(project);
             const slug = generateSlug(project.title);
+            const placement =
+              idx === 0
+                ? 'featured-project-card-primary'
+                : idx === 1
+                  ? 'featured-project-card-secondary'
+                  : 'featured-project-card-tertiary';
 
             return (
-              <article key={project.id} className="brutal-card brutal-card-hover featured-project-card p-0 overflow-hidden group">
-                <div className={`h-52 bg-gradient-to-br ${gradients[idx % 3]} border-b-3 border-brutal-black flex items-center justify-center relative overflow-hidden`}>
+              <article key={project.id} className={`brutal-card brutal-card-hover featured-project-card ${config.cardClass} ${placement} p-0 overflow-hidden group`}>
+                <div className={`featured-project-card-media bg-gradient-to-br ${config.gradient} border-b-3 border-brutal-black flex items-center justify-center relative overflow-hidden`}>
                   {coverImage ? (
                     <img
                       src={coverImage}
@@ -113,9 +128,10 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
         )}
 
         {featured.length > 0 && (
-          <div className="text-center mt-12">
-            <Link href="/projects" className="brutal-btn brutal-btn-dark text-base px-8 py-3">
-              استعرض كل المشاريع
+          <div className="featured-projects-cta-wrap text-center mt-12">
+            <p className="featured-projects-cta-label">اكتشف جميع الأعمال والتفاصيل</p>
+            <Link href="/projects" className="brutal-btn brutal-btn-coral featured-projects-cta text-base px-10 py-3.5">
+              استعرض كل المشاريع <span aria-hidden="true">←</span>
             </Link>
           </div>
         )}
