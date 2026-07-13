@@ -34,70 +34,80 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* العنوان */}
-        <div className="text-center mb-14">
-          <span className="brutal-tag bg-sky text-brutal-black mb-4 inline-block">🚀 المشاريع</span>
+        <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-brutal-black mb-4">
             أعمال بارزة
           </h2>
           <p className="text-brutal-black/45 text-lg max-w-xl mx-auto">نماذج من أفضل المشاريع التي أنجزتها</p>
         </div>
 
-        {/* كروت */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featured.map((project, idx) => {
-            const config = typeConfig[project.project_type] || typeConfig.other;
-            const slug = generateSlug(project.title);
+        {/* الحاوية الزرقاء — المشروع الأول فوق، الثاني يميناً، والثالث يساراً */}
+        {featured.length > 0 && (
+          <div className="featured-projects-stage">
+            {featured.map((project, idx) => {
+              const config = typeConfig[project.project_type] || typeConfig.other;
+              const slug = generateSlug(project.title);
+              const placement =
+                idx === 0
+                  ? 'featured-project-card-primary'
+                  : idx === 1
+                    ? 'featured-project-card-secondary'
+                    : 'featured-project-card-tertiary';
 
-            return (
-              <div key={project.id} className="brutal-card brutal-card-hover p-0 overflow-hidden group">
-                <div className={`h-52 bg-gradient-to-br ${gradients[idx % 3]} border-b-3 border-brutal-black flex items-center justify-center relative`}>
-                  <span className="text-7xl group-hover:scale-110 transition-transform duration-300">
-                    {config.emoji}
-                  </span>
-                  {project.is_featured && (
-                    <span className="absolute top-3 right-3 brutal-tag bg-warm text-brutal-black rotate-3 animate-wiggle">
-                      ⭐ مميز
+              return (
+                <article
+                  key={project.id}
+                  className={`brutal-card brutal-card-hover featured-project-card ${placement} p-0 overflow-hidden group`}
+                >
+                  <div className={`h-52 ${idx === 0 ? 'md:h-60' : ''} bg-gradient-to-br ${gradients[idx % 3]} border-b-3 border-brutal-black flex items-center justify-center relative`}>
+                    <span className="text-7xl group-hover:scale-110 transition-transform duration-300">
+                      {config.emoji}
                     </span>
-                  )}
-                  <span className={`absolute bottom-3 left-3 brutal-tag ${config.color} text-brutal-black`}>
-                    {config.label}
-                  </span>
-                </div>
+                    {project.is_featured && (
+                      <span className="absolute top-3 right-3 brutal-tag bg-warm text-brutal-black rotate-3 animate-wiggle">
+                        ⭐ مميز
+                      </span>
+                    )}
+                    <span className={`absolute bottom-3 left-3 brutal-tag ${config.color} text-brutal-black`}>
+                      {config.label}
+                    </span>
+                  </div>
 
-                <div className="p-6">
-                  <h3 className="text-xl font-extrabold text-brutal-black mb-2 group-hover:text-mint-dark transition-colors">
-                    {project.title}
-                  </h3>
+                  <div className="p-6">
+                    <h3 className="text-xl font-extrabold text-brutal-black mb-2 group-hover:text-mint-dark transition-colors">
+                      {project.title}
+                    </h3>
 
-                  {project.description && (
-                    <p className="text-brutal-black/50 text-sm mb-5 line-clamp-2 leading-relaxed">
-                      {project.description.substring(0, 120)}...
-                    </p>
-                  )}
+                    {project.description && (
+                      <p className="text-brutal-black/50 text-sm mb-5 line-clamp-2 leading-relaxed">
+                        {project.description.substring(0, 120)}...
+                      </p>
+                    )}
 
-                  {project.tags && project.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mb-5">
-                      {project.tags.slice(0, 4).map((tag) => (
-                        <span key={tag} className="brutal-tag bg-brutal-gray text-brutal-black text-xs">
-                          {tag}
-                        </span>
-                      ))}
-                      {project.tags.length > 4 && (
-                        <span className="brutal-tag bg-brutal-gray text-brutal-black/40 text-xs">
-                          +{project.tags.length - 4}
-                        </span>
-                      )}
-                    </div>
-                  )}
+                    {project.tags && project.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-5">
+                        {project.tags.slice(0, 4).map((tag) => (
+                          <span key={tag} className="brutal-tag bg-brutal-gray text-brutal-black text-xs">
+                            {tag}
+                          </span>
+                        ))}
+                        {project.tags.length > 4 && (
+                          <span className="brutal-tag bg-brutal-gray text-brutal-black/40 text-xs">
+                            +{project.tags.length - 4}
+                          </span>
+                        )}
+                      </div>
+                    )}
 
-                  <Link href={`/projects/${slug}`} className="brutal-btn brutal-btn-warm w-full text-sm">
-                    عرض التفاصيل ←
-                  </Link>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                    <Link href={`/projects/${slug}`} className="brutal-btn brutal-btn-warm w-full text-sm">
+                      عرض التفاصيل ←
+                    </Link>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
 
         {featured.length === 0 && (
           <div className="text-center py-16">
