@@ -333,7 +333,7 @@ body {
 
 .featured-project-card-media {
   height: 12.5rem;
-  border-bottom-color: var(--project-accent) !important;
+  border-bottom-color: var(--color-brutal-black) !important;
 }
 
 html[dir="rtl"] .featured-project-card {
@@ -373,7 +373,7 @@ html[dir="rtl"] .project-card-type-other.brutal-card-hover:hover {
 }
 
 .project-card-cover {
-  border-bottom-color: var(--project-accent) !important;
+  border-bottom-color: var(--color-brutal-black) !important;
 }
 
 .featured-project-card-content {
