@@ -42,7 +42,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   const projects = await getProjects(params.type);
 
   return (
-    <main className="projects-page min-h-screen bg-brutal-gray">
+    <main className="projects-page min-h-screen">
       <Navbar />
 
       <div className="section-padding pt-28 pb-20">

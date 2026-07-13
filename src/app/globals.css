@@ -468,6 +468,18 @@ html[dir="rtl"] .featured-projects-cta:hover {
 /* =====================================================   Projects pages polish
    ============================================================ */
 
+.projects-page {
+  background-color: rgba(255, 255, 255, 0.72);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 12px,
+    rgba(15, 15, 15, 0.02) 12px,
+    rgba(15, 15, 15, 0.02) 24px
+  );
+  background-attachment: fixed;
+}
+
 .projects-page-header {
   max-width: 46rem;
   margin-inline: auto;
@@ -496,6 +508,10 @@ html[dir="rtl"] .featured-projects-cta:hover {
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+.projects-grid > .featured-project-card-no-image {
+  height: auto;
 }
 
 .projects-grid > .project-card-no-image {
