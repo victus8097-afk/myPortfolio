@@ -69,7 +69,8 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
 
               return (
                 <div key={project.id} className={`featured-project-item ${placement}`}>
-                  <article className="brutal-card brutal-card-hover featured-project-card p-0 overflow-hidden group">
+                  <div className="featured-project-card-frame">
+                    <article className="brutal-card brutal-card-hover featured-project-card p-0 overflow-hidden group">
                     <div className={`featured-project-card-media bg-gradient-to-br ${gradients[idx % 3]} border-b-3 border-brutal-black flex items-center justify-center relative`}>
                       <span className={`${idx === 0 ? 'text-7xl' : 'text-6xl'} group-hover:scale-110 transition-transform duration-300`}>
                         {config.emoji}
@@ -114,7 +115,8 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                         عرض التفاصيل ←
                       </Link>
                     </div>
-                  </article>
+                    </article>
+                  </div>
 
                   {/* شارة ترتيب المشروع أسفل البطاقة */}
                   <div className="featured-project-rank-wrap">

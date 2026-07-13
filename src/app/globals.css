@@ -275,7 +275,7 @@ body {
  */
 .featured-projects-grid {
   width: 100%;
-  max-width: 64rem;
+  max-width: 58rem;
   margin-inline: auto;
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.3fr) minmax(0, 0.85fr);
@@ -302,10 +302,19 @@ body {
   grid-area: tertiary;
 }
 
-.featured-project-card {
-  min-width: 0;
+.featured-project-card-frame {
+  position: relative;
+  width: 100%;
   aspect-ratio: 1 / 1;
-  height: auto;
+}
+
+.featured-project-card {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }
