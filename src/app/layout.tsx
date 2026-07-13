@@ -4,6 +4,7 @@
 
 import type { Metadata } from 'next';
 import './globals.css';
+import ScrollPositionManager from '@/components/ScrollPositionManager';
 
 export const metadata: Metadata = {
   title: 'Portfolio — موقع شخصي ديناميكي',
@@ -28,6 +29,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         {children}
+        <ScrollPositionManager />
       </body>
     </html>
   );
