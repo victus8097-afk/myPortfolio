@@ -6,6 +6,7 @@
 // ============================================================
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import type { Project, Skill, ContactChannel, ProfileSettings, DashboardStats } from '@/types';
 import {
@@ -127,9 +128,9 @@ export default function DashboardPage() {
           🎛️ لوحة التحكم
         </h1>
         <div className="flex items-center gap-3">
-          <a href="/" className="brutal-btn bg-white text-sm">
+          <Link href="/" className="brutal-btn bg-white text-sm">
             👁️ عرض الموقع
-          </a>
+          </Link>
           <button onClick={handleLogout} className="brutal-btn brutal-btn-red text-sm">
             <LogOut size={16} />
             خروج
