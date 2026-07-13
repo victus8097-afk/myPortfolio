@@ -45,7 +45,7 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-brutal-black mb-4">
             الأدوات والتقنيات
           </h2>
-          <p className="text-brutal-black/45 text-lg max-w-xl mx-auto">
+          <p className="text-brutal-black/65 text-lg max-w-xl mx-auto">
             الأدوات والتقنيات التي أستخدمها لبناء حلول رقمية متكاملة
           </p>
         </div>
@@ -56,7 +56,7 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
 
           return (
             <div key={category} className="mb-6 last:mb-0">
-              <h3 className="text-lg sm:text-xl font-extrabold text-brutal-black mb-3 text-center">
+              <h3 className="skills-category-title text-xl sm:text-2xl font-black text-brutal-black mb-5 text-center">
                 {category}
               </h3>
 
@@ -74,7 +74,7 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
                       key={skill.id}
                       className={`brutal-skill-cube skills-tool-card ${cubeColors[(groupIdx * 3 + idx) % cubeColors.length]} text-brutal-black text-center`}
                     >
-                      <span className="text-base font-extrabold leading-tight">{skill.skill_name}</span>
+                      <span className="text-base sm:text-lg font-extrabold leading-tight">{skill.skill_name}</span>
                     </div>
                   ))}
                 </div>

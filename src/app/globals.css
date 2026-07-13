@@ -560,13 +560,13 @@ html[dir="rtl"] .featured-projects-cta:hover {
 }
 
 .skills-tool-card {
-  width: 11rem;
-  height: 4.75rem;
+  width: 12rem;
+  height: 5.25rem;
   padding: 0.75rem 1rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 11rem;
+  flex: 0 0 12rem;
 }
 
 @media (max-width: 767px) {
@@ -575,9 +575,9 @@ html[dir="rtl"] .featured-projects-cta:hover {
   }
 
   .skills-tool-card {
-    width: min(10rem, calc(50vw - 2rem));
-    height: 4.25rem;
-    flex-basis: min(10rem, calc(50vw - 2rem));
+    width: min(10.5rem, calc(50vw - 2rem));
+    height: 4.5rem;
+    flex-basis: min(10.5rem, calc(50vw - 2rem));
     padding-inline: 0.5rem;
   }
 }
