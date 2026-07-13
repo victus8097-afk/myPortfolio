@@ -69,7 +69,7 @@ export default function MediaSlider({ media }: MediaSliderProps) {
           {currentMedia.media_type === 'image' ? (
             <img
               src={currentMedia.media_url}
-              alt={`وسائط المشروع ${currentIndex + 1}`}
+              alt={`وسائط العمل ${currentIndex + 1}`}
               className="w-full h-full object-contain"
             />
           ) : (

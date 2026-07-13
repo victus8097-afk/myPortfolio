@@ -57,7 +57,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
               معرض الأعمال
             </h1>
             <p className="text-[#111111]/55 text-base sm:text-lg max-w-xl mx-auto">
-              جميع المشاريع والأعمال المنجزة
+              جميع الأعمال المنجزة
             </p>
           </header>
 
@@ -79,10 +79,10 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                 <div className="brutal-card p-12 max-w-md mx-auto">
                   <div className="featured-empty-mark mx-auto mb-5" aria-hidden="true"></div>
                   <h3 className="text-xl font-bold text-[#111111] mb-2">
-                    لا توجد مشاريع حالياً
+                    لا توجد أعمال حالياً
                   </h3>
                   <p className="text-[#111111]/60 mb-6">
-                    سيتم إضافة مشاريع جديدة قريباً!
+                    سيتم إضافة أعمال جديدة قريباً!
                   </p>
                   <Link href="/" className="brutal-btn brutal-btn-mint">
                     ← العودة للرئيسية

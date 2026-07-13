@@ -1,6 +1,6 @@
 // ============================================================
 // ProjectMetaBox.tsx — صندوق البيانات الوصفية والتقنيات
-// Server Component: عرض تفاصيل المشروع التقنية
+// Server Component: عرض تفاصيل العمل التقنية
 // ============================================================
 
 import type { Project } from '@/types';
@@ -23,11 +23,11 @@ export default function ProjectMetaBox({ project }: ProjectMetaBoxProps) {
         className="text-lg font-black text-[#111111] mb-4"
         style={{ fontFamily: 'var(--font-heading)' }}
       >
-        تفاصيل المشروع
+        تفاصيل العمل
       </h3>
 
       <div className="space-y-4">
-        {/* نوع المشروع */}
+        {/* نوع العمل */}
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-sky/30 rounded-lg flex items-center justify-center border-2 border-[#111111]">
             <Tag size={16} />
@@ -88,7 +88,7 @@ export default function ProjectMetaBox({ project }: ProjectMetaBoxProps) {
               className="brutal-btn brutal-btn-mint w-full text-sm"
             >
               <ExternalLink size={16} />
-              الرابط الحي للمشروع
+              الرابط الحي للعمل
             </a>
           )}
           {project.store_url && (

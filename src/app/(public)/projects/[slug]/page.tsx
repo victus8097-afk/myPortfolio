@@ -1,5 +1,5 @@
 // ============================================================
-// صفحة تفاصيل المشروع — Project Details Page
+// صفحة تفاصيل العمل — Project Details Page
 // Server Component: Dynamic Route عبر [slug]
 // ============================================================
 
@@ -28,15 +28,15 @@ export async function generateMetadata({ params }: ProjectDetailPageProps) {
   const { slug } = await params;
   const project = await getProjectBySlug(slug);
   return {
-    title: project ? `${project.title} | Portfolio` : 'المشروع غير موجود',
-    description: project?.description?.substring(0, 160) || 'مشروع من مشاريعي',
+    title: project ? `${project.title} | Portfolio` : 'العمل غير موجود',
+    description: project?.description?.substring(0, 160) || 'عمل من أعمالي',
   };
 }
 
 async function getProjectBySlug(slug: string) {
   const supabase = await createClient();
 
-  // البحث عن المشروع — نحاول أولاً بالـ slug ثم بالعنوان
+  // البحث عن العمل — نحاول أولاً بالـ slug ثم بالعنوان
   const { data: projects } = await supabase
     .from('projects')
     .select('*')
@@ -95,7 +95,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
           </div>
 
           <header className={`project-detail-header ${typeClass} mb-10`}>
-            <p className="text-sm font-bold text-[#111111]/45 mb-3">تفاصيل المشروع</p>
+            <p className="text-sm font-bold text-[#111111]/45 mb-3">تفاصيل العمل</p>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#111111] leading-tight">
               {project.title}
             </h1>
@@ -108,7 +108,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
               {project.description && (
                 <article className="project-detail-description brutal-card p-6 sm:p-8">
                   <h2 className="text-2xl font-black text-[#111111] mb-4">
-                    عن المشروع
+                    عن العمل
                   </h2>
                   <div
                     className="prose prose-lg max-w-none text-[#111111]/80 leading-relaxed"

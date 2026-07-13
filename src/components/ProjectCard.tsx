@@ -48,7 +48,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         <div className={`project-card-cover bg-gradient-to-br ${config.gradient} border-b-3 border-[#111111] flex items-center justify-center relative overflow-hidden`}>
           <img
             src={coverImage}
-            alt={`صورة مشروع ${project.title}`}
+            alt={`صورة العمل ${project.title}`}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
           <span className={`absolute bottom-3 left-3 brutal-tag ${config.color} text-brutal-black`}>

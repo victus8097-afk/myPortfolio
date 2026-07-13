@@ -11,7 +11,7 @@ import { Menu, X } from 'lucide-react';
 const navLinks = [
   { label: 'الرئيسية', href: '#hero' },
   { label: 'الأدوات والتقنيات', href: '#skills' },
-  { label: 'المشاريع', href: '#projects' },
+  { label: 'الأعمال', href: '#projects' },
 ];
 
 const allSections = [...navLinks.map((l) => l.href), '#contact'];
