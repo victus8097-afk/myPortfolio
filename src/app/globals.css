@@ -1,0 +1,291 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Global Styles — Flat Cartoon / Neo-Brutalism Theme
+   ============================================================ */
+
+@theme {
+  --color-mint: #34D399;
+  --color-mint-dark: #10B981;
+  --color-mint-light: #A7F3D0;
+  --color-sky: #38BDF8;
+  --color-sky-dark: #0EA5E9;
+  --color-sky-light: #BAE6FD;
+  --color-warm: #FBBF24;
+  --color-warm-dark: #F59E0B;
+  --color-warm-light: #FDE68A;
+  --color-coral: #FB7185;
+  --color-coral-dark: #F43F5E;
+  --color-purple: #A78BFA;
+  --color-purple-dark: #8B5CF6;
+  --color-brutal-black: #0F0F0F;
+  --color-brutal-dark: #1A1A2E;
+  --color-brutal-gray: #F8F9FB;
+  --color-brutal-white: #FFFFFF;
+  --color-brutal-red: #EF4444;
+
+  --font-sans: 'Poppins', 'Rubik', sans-serif;
+  --font-heading: 'Poppins', 'Rubik', sans-serif;
+  --font-body: 'Poppins', 'Rubik', sans-serif;
+}
+
+* {
+  border-color: var(--color-brutal-black);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-brutal-gray);
+  color: var(--color-brutal-black);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+::selection {
+  background: var(--color-mint);
+  color: var(--color-brutal-black);
+}
+
+/* ============================================================
+   Background Gradients & Patterns
+   ============================================================ */
+
+/* خلفية الجسم الرئيسي — أبيض مع شرائط مائلة */
+body {
+  background: var(--color-brutal-white);
+  background-attachment: fixed;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 12px,
+    rgba(15, 15, 15, 0.018) 12px,
+    rgba(15, 15, 15, 0.018) 24px
+  );
+}
+
+/* نقاط دائرية خلفية */
+.dot-pattern {
+  background-image: radial-gradient(circle, var(--color-brutal-black) 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.035;
+}
+
+/* شرائط مائلة */
+.stripe-pattern {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 12px,
+    rgba(15, 15, 15, 0.02) 12px,
+    rgba(15, 15, 15, 0.02) 24px
+  );
+}
+
+/* شبكة هندسية */
+.grid-pattern {
+  background-image:
+    linear-gradient(rgba(15,15,15,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15,15,15,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ============================================================
+   Neo-Brutalism Components
+   ============================================================ */
+
+.brutal-card {
+  background: var(--color-brutal-white);
+  border: 3px solid var(--color-brutal-black);
+  box-shadow: 6px 6px 0px var(--color-brutal-black);
+  border-radius: 16px;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.brutal-card-hover:hover {
+  box-shadow: 10px 10px 0px var(--color-brutal-black);
+  transform: translate(-3px, -3px);
+}
+
+.brutal-btn {
+  border: 3px solid var(--color-brutal-black);
+  box-shadow: 4px 4px 0px var(--color-brutal-black);
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 0.75rem 1.75rem;
+  transition: all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-sans);
+}
+
+.brutal-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.brutal-btn:hover {
+  box-shadow: 7px 7px 0px var(--color-brutal-black);
+  transform: translate(-2px, -2px);
+}
+
+.brutal-btn:active {
+  box-shadow: 2px 2px 0px var(--color-brutal-black);
+  transform: translate(2px, 2px);
+}
+
+.brutal-btn-mint { background: var(--color-mint); color: var(--color-brutal-black); }
+.brutal-btn-sky { background: var(--color-sky); color: var(--color-brutal-black); }
+.brutal-btn-warm { background: var(--color-warm); color: var(--color-brutal-black); }
+.brutal-btn-dark { background: var(--color-brutal-dark); color: var(--color-brutal-white); }
+.brutal-btn-red { background: var(--color-brutal-red); color: var(--color-brutal-white); }
+.brutal-btn-coral { background: var(--color-coral); color: var(--color-brutal-black); }
+.brutal-btn-purple { background: var(--color-purple); color: var(--color-brutal-white); }
+
+.brutal-input {
+  border: 3px solid var(--color-brutal-black);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  background: var(--color-brutal-white);
+  font-weight: 500;
+  font-family: var(--font-sans);
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.brutal-input:focus {
+  outline: none;
+  border-color: var(--color-mint);
+  box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.25);
+}
+
+.brutal-skill-cube {
+  border: 3px solid var(--color-brutal-black);
+  box-shadow: 4px 4px 0px var(--color-brutal-black);
+  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: default;
+}
+
+.brutal-skill-cube:hover {
+  transform: translateY(-6px) rotate(-1deg);
+  box-shadow: 7px 10px 0px var(--color-brutal-black);
+}
+
+.brutal-tag {
+  border: 2px solid var(--color-brutal-black);
+  border-radius: 8px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  display: inline-block;
+}
+
+/* Shimmer Animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 10px;
+}
+
+/* Scroll to Top */
+.scroll-top-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 50;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 3px solid var(--color-brutal-black);
+  box-shadow: 4px 4px 0px var(--color-brutal-black);
+  background: var(--color-mint);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.scroll-top-btn:hover {
+  box-shadow: 6px 6px 0px var(--color-brutal-black);
+  transform: translate(-2px, -2px);
+}
+
+/* Section spacing */
+.section-padding {
+  padding: 5rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding: 6rem 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-padding {
+    padding: 7rem 2rem;
+  }
+}
+
+/* ============================================================
+   RTL Adjustments
+   ============================================================ */
+
+[dir="rtl"] .brutal-card { box-shadow: -6px 6px 0px var(--color-brutal-black); }
+[dir="rtl"] .brutal-card-hover:hover { box-shadow: -10px 10px 0px var(--color-brutal-black); }
+[dir="rtl"] .brutal-btn { box-shadow: -4px 4px 0px var(--color-brutal-black); }
+[dir="rtl"] .brutal-btn:hover { box-shadow: -7px 7px 0px var(--color-brutal-black); }
+[dir="rtl"] .brutal-skill-cube { box-shadow: -4px 4px 0px var(--color-brutal-black); }
+[dir="rtl"] .brutal-skill-cube:hover { box-shadow: -7px 10px 0px var(--color-brutal-black); }
+
+/* ============================================================
+   Animations
+   ============================================================ */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(2deg); }
+  75% { transform: rotate(-2deg); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-wiggle {
+  animation: wiggle 2s ease-in-out infinite;
+}
+

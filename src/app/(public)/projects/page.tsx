@@ -1,0 +1,100 @@
+// ============================================================
+// صفحة معرض الأعمال الشامل — Projects Showcase Page
+// Server Component: مفلترة عبر URL Query Params
+// ============================================================
+
+import { Suspense } from 'react';
+import { createClient } from '@/lib/supabase/server';
+import FilterBar from '@/components/FilterBar';
+import ProjectCard from '@/components/ProjectCard';
+import SkeletonCard from '@/components/SkeletonCard';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import ScrollToTop from '@/components/ScrollToTop';
+import Link from 'next/link';
+import type { Project, ProjectType } from '@/types';
+
+interface ProjectsPageProps {
+  searchParams: Promise<{ type?: string }>;
+}
+
+async function getProjects(type?: string) {
+  const supabase = await createClient();
+
+  let query = supabase
+    .from('projects')
+    .select('*')
+    .eq('is_visible', true)
+    .order('is_featured', { ascending: false })
+    .order('created_at', { ascending: false });
+
+  if (type && type !== 'all') {
+    query = query.eq('project_type', type as ProjectType);
+  }
+
+  const { data, error } = await query;
+  if (error) console.error('Error fetching projects:', error);
+  return (data as Project[]) || [];
+}
+
+export default async function ProjectsPage({ searchParams }: ProjectsPageProps) {
+  const params = await searchParams;
+  const projects = await getProjects(params.type);
+
+  return (
+    <main className="min-h-screen bg-brutal-gray">
+      <Navbar />
+
+      <div className="section-padding pt-24">
+        <div className="max-w-7xl mx-auto">
+          {/* العنوان */}
+          <div className="text-center mb-10">
+            <h1
+              className="text-3xl sm:text-4xl font-black text-[#111111] mb-3"
+              style={{ fontFamily: 'var(--font-heading)' }}
+            >
+              🎨 معرض الأعمال
+            </h1>
+            <p className="text-[#111111]/60 text-lg">
+              جميع المشاريع والأعمال المنجزة
+            </p>
+          </div>
+
+          {/* شريط الفلترة */}
+          <Suspense>
+            <FilterBar />
+          </Suspense>
+
+          {/* شبكة المشاريع */}
+          <Suspense fallback={<SkeletonCard type="project" count={6} />}>
+            {projects.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {projects.map((project) => (
+                  <ProjectCard key={project.id} project={project} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20">
+                <div className="brutal-card p-12 max-w-md mx-auto">
+                  <span className="text-6xl mb-4 block">📭</span>
+                  <h3 className="text-xl font-bold text-[#111111] mb-2">
+                    لا توجد مشاريع حالياً
+                  </h3>
+                  <p className="text-[#111111]/60 mb-6">
+                    سيتم إضافة مشاريع جديدة قريباً!
+                  </p>
+                  <Link href="/" className="brutal-btn brutal-btn-mint">
+                    ← العودة للرئيسية
+                  </Link>
+                </div>
+              </div>
+            )}
+          </Suspense>
+        </div>
+      </div>
+
+      <Footer />
+      <ScrollToTop />
+    </main>
+  );
+}
