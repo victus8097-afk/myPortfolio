@@ -10,10 +10,25 @@ interface ProjectCardProps {
   project: Project;
 }
 
-const typeLabel: Record<string, string> = {
-  mobile_app: 'تطبيق جوال',
-  web_app: 'موقع ويب',
-  other: 'عمل آخر',
+const typeConfig: Record<string, { color: string; label: string; cardClass: string; gradient: string }> = {
+  mobile_app: {
+    color: 'bg-warm',
+    label: 'تطبيق جوال',
+    cardClass: 'project-card-type-mobile',
+    gradient: 'from-warm/35 to-coral/20',
+  },
+  web_app: {
+    color: 'bg-sky',
+    label: 'موقع ويب',
+    cardClass: 'project-card-type-web',
+    gradient: 'from-sky/35 to-purple/20',
+  },
+  other: {
+    color: 'bg-purple',
+    label: 'عمل آخر',
+    cardClass: 'project-card-type-other',
+    gradient: 'from-purple/35 to-mint/20',
+  },
 };
 
 export default function ProjectCard({ project }: ProjectCardProps) {
@@ -24,17 +39,12 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     .replace(/-+/g, '-')
     .trim();
   const coverImage = getCoverImage(project);
-  const typeCardClass =
-    project.project_type === 'mobile_app'
-      ? 'project-card-type-mobile'
-      : project.project_type === 'web_app'
-        ? 'project-card-type-web'
-        : 'project-card-type-other';
+  const config = typeConfig[project.project_type] || typeConfig.other;
 
   return (
-    <div className={`brutal-card brutal-card-hover ${typeCardClass} p-0 overflow-hidden group`}>
+    <article className={`brutal-card brutal-card-hover ${config.cardClass} p-0 overflow-hidden group`}>
       {/* صورة الغلاف من project_media في قاعدة البيانات */}
-      <div className="project-card-cover h-48 bg-gradient-to-br from-sky/20 to-mint/20 border-b-3 border-[#111111] flex items-center justify-center relative overflow-hidden">
+      <div className={`project-card-cover bg-gradient-to-br ${config.gradient} border-b-3 border-[#111111] flex items-center justify-center relative overflow-hidden`}>
         {coverImage ? (
           <img
             src={coverImage}
@@ -44,52 +54,47 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         ) : (
           <span className="text-sm font-bold text-[#111111]/45">لا توجد صورة مضافة</span>
         )}
-        {project.is_featured && (
-          <span className="absolute top-3 right-3 brutal-tag bg-warm text-[#111111] rotate-3">
-            مميز
-          </span>
-        )}
+        <span className={`absolute bottom-3 left-3 brutal-tag ${config.color} text-brutal-black`}>
+          {config.label}
+        </span>
       </div>
 
       {/* محتوى الكرت */}
-      <div className="project-card-content p-5">
-        <h3
-          className="text-lg font-black text-[#111111] mb-1"
-          style={{ fontFamily: 'var(--font-heading)' }}
-        >
+      <div className="project-card-content p-6">
+        <h3 className="text-xl font-extrabold text-[#111111] mb-2 group-hover:text-mint-dark transition-colors">
           {project.title}
         </h3>
 
-        <p className="text-xs text-[#111111]/50 mb-2 font-medium">
-          {typeLabel[project.project_type] || project.project_type}
-        </p>
-
         {project.description && (
-          <p className="text-[#111111]/60 text-sm mb-4 line-clamp-2">
-            {project.description.substring(0, 100)}...
+          <p className="text-[#111111]/50 text-sm mb-5 line-clamp-2 leading-relaxed">
+            {project.description.substring(0, 120)}...
           </p>
         )}
 
         {/* تقنيات المشروع كملصقات */}
         {project.tags && project.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {project.tags.slice(0, 5).map((tag) => (
-              <span key={tag} className="brutal-tag bg-sky/30 text-[#111111]">
+          <div className="flex flex-wrap gap-1.5 mb-5">
+            {project.tags.slice(0, 4).map((tag) => (
+              <span key={tag} className="brutal-tag bg-brutal-gray text-[#111111] text-xs">
                 {tag}
               </span>
             ))}
+            {project.tags.length > 4 && (
+              <span className="brutal-tag bg-brutal-gray text-[#111111]/40 text-xs">
+                +{project.tags.length - 4}
+              </span>
+            )}
           </div>
         )}
 
-        {/* زر التفاصيل */}
         <Link
           href={`/projects/${slug}`}
-          className="brutal-btn brutal-btn-mint w-full text-sm"
+          className="brutal-btn brutal-btn-warm w-full text-sm"
         >
           عرض التفاصيل ←
         </Link>
       </div>
-    </div>
+    </article>
   );
 }
 

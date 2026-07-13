@@ -373,6 +373,7 @@ html[dir="rtl"] .project-card-type-other.brutal-card-hover:hover {
 }
 
 .project-card-cover {
+  height: 12.5rem;
   border-bottom-color: var(--color-brutal-black) !important;
 }
 
