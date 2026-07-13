@@ -29,13 +29,18 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
       {/* خلفية — أبيض مع شرائط مائلة */}
       <div className="absolute inset-0 bg-white/70 backdrop-blur-sm"></div>
       <div className="absolute inset-0 stripe-pattern pointer-events-none"></div>
+      <div className="featured-projects-highlight absolute pointer-events-none"></div>
       <div className="absolute -top-32 -right-32 w-80 h-80 bg-sky/12 rounded-full blur-[100px] pointer-events-none"></div>
       <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-coral/10 rounded-full blur-[100px] pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* العنوان */}
-        <div className="text-center mb-14">
-          <span className="brutal-tag bg-sky text-brutal-black mb-4 inline-block">🚀 المشاريع</span>
+        <div className="text-center mb-12">
+          <div className="featured-heading-mark mb-5" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-brutal-black mb-4">
             أعمال بارزة
           </h2>
@@ -49,7 +54,7 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
             const slug = generateSlug(project.title);
 
             return (
-              <div key={project.id} className="brutal-card brutal-card-hover p-0 overflow-hidden group">
+              <article key={project.id} className="brutal-card brutal-card-hover featured-project-card p-0 overflow-hidden group">
                 <div className={`h-52 bg-gradient-to-br ${gradients[idx % 3]} border-b-3 border-brutal-black flex items-center justify-center relative`}>
                   <span className="text-7xl group-hover:scale-110 transition-transform duration-300">
                     {config.emoji}
@@ -64,7 +69,7 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                   </span>
                 </div>
 
-                <div className="p-6">
+                <div className="featured-project-card-content p-6">
                   <h3 className="text-xl font-extrabold text-brutal-black mb-2 group-hover:text-mint-dark transition-colors">
                     {project.title}
                   </h3>
@@ -94,7 +99,7 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                     عرض التفاصيل ←
                   </Link>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>

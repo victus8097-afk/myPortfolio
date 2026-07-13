@@ -256,6 +256,69 @@ body {
 }
 
 /* ============================================================
+   Featured projects polish
+   ============================================================ */
+
+/* شريط أزرق باهت ومستقيم خلف البطاقات، مستوحى من شريط الهيرو */
+.featured-projects-highlight {
+  top: 45%;
+  left: 50%;
+  width: 140%;
+  height: 320px;
+  transform: translate(-50%, -50%);
+  background: rgba(56, 189, 248, 0.1);
+  border-top: 3px solid rgba(56, 189, 248, 0.18);
+  border-bottom: 3px solid rgba(56, 189, 248, 0.18);
+}
+
+.featured-heading-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  height: 0.75rem;
+}
+
+.featured-heading-mark span {
+  display: block;
+  width: 0.45rem;
+  height: 0.45rem;
+  border: 2px solid var(--color-brutal-black);
+  border-radius: 999px;
+  background: var(--color-sky);
+}
+
+.featured-heading-mark span:first-child,
+.featured-heading-mark span:last-child {
+  width: 0.35rem;
+  height: 0.35rem;
+  background: var(--color-mint);
+}
+
+.featured-project-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.featured-project-card-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.featured-project-card-content > .brutal-btn {
+  margin-top: auto;
+}
+
+@media (max-width: 767px) {
+  .featured-projects-highlight {
+    top: 48%;
+    height: 360px;
+  }
+}
+
+/* ============================================================
    RTL Adjustments
    ============================================================ */
 
