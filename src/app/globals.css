@@ -285,10 +285,10 @@ body {
 
 .featured-projects-grid {
   width: 100%;
-  max-width: 72rem;
+  max-width: 68rem;
   margin-inline: auto;
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.15fr) minmax(0, 0.9fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr) minmax(0, 1fr);
   grid-template-areas: "secondary primary tertiary";
   align-items: stretch;
   gap: 1.5rem;
@@ -301,7 +301,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
-  box-shadow: 7px 7px 0 var(--project-accent);
+  box-shadow: 7px 7px 0 var(--color-brutal-black);
 }
 
 .featured-project-card-primary {
@@ -332,48 +332,48 @@ body {
 }
 
 .featured-project-card-media {
-  height: 13rem;
+  height: 12.5rem;
   border-bottom-color: var(--project-accent) !important;
 }
 
 .featured-project-card-primary .featured-project-card-media {
-  height: 15rem;
+  height: 14rem;
 }
 
 html[dir="rtl"] .featured-project-card {
-  box-shadow: -7px 7px 0 var(--project-accent);
+  box-shadow: -7px 7px 0 var(--color-brutal-black);
 }
 
 .featured-project-card.brutal-card-hover:hover {
-  box-shadow: 10px 10px 0 var(--project-accent);
+  box-shadow: 10px 10px 0 var(--color-brutal-black);
 }
 
 html[dir="rtl"] .featured-project-card.brutal-card-hover:hover {
-  box-shadow: -10px 10px 0 var(--project-accent);
+  box-shadow: -10px 10px 0 var(--color-brutal-black);
 }
 
 .project-card-type-mobile,
 .project-card-type-web,
 .project-card-type-other {
-  box-shadow: 6px 6px 0 var(--project-accent);
+  box-shadow: 6px 6px 0 var(--color-brutal-black);
 }
 
 .project-card-type-mobile.brutal-card-hover:hover,
 .project-card-type-web.brutal-card-hover:hover,
 .project-card-type-other.brutal-card-hover:hover {
-  box-shadow: 9px 9px 0 var(--project-accent);
+  box-shadow: 9px 9px 0 var(--color-brutal-black);
 }
 
 html[dir="rtl"] .project-card-type-mobile,
 html[dir="rtl"] .project-card-type-web,
 html[dir="rtl"] .project-card-type-other {
-  box-shadow: -6px 6px 0 var(--project-accent);
+  box-shadow: -6px 6px 0 var(--color-brutal-black);
 }
 
 html[dir="rtl"] .project-card-type-mobile.brutal-card-hover:hover,
 html[dir="rtl"] .project-card-type-web.brutal-card-hover:hover,
 html[dir="rtl"] .project-card-type-other.brutal-card-hover:hover {
-  box-shadow: -9px 9px 0 var(--project-accent);
+  box-shadow: -9px 9px 0 var(--color-brutal-black);
 }
 
 .project-card-cover {
@@ -385,7 +385,7 @@ html[dir="rtl"] .project-card-type-other.brutal-card-hover:hover {
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 1.5rem;
+  padding: 1.25rem;
 }
 
 .featured-project-card-content > .brutal-btn {
