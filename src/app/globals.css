@@ -259,16 +259,16 @@ body {
    Featured projects polish
    ============================================================ */
 
-/* شريط أزرق باهت ومستقيم خلف البطاقات، مستوحى من شريط الهيرو */
+/* شريط أزرق باهت مستقيم، بنفس أبعاد شريط الهيرو */
 .featured-projects-highlight {
-  top: 45%;
+  top: 55%;
   left: 50%;
   width: 140%;
-  height: 320px;
+  height: 360px;
   transform: translate(-50%, -50%);
-  background: rgba(56, 189, 248, 0.1);
-  border-top: 3px solid rgba(56, 189, 248, 0.18);
-  border-bottom: 3px solid rgba(56, 189, 248, 0.18);
+  background: rgba(56, 189, 248, 0.15);
+  border-top: 3px solid rgba(15, 15, 15, 0.08);
+  border-bottom: 3px solid rgba(15, 15, 15, 0.08);
 }
 
 .featured-heading-mark {
@@ -329,8 +329,7 @@ body {
 
 @media (max-width: 767px) {
   .featured-projects-highlight {
-    top: 48%;
-    height: 360px;
+    top: 55%;
   }
 }
 
