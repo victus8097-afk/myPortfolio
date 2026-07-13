@@ -42,31 +42,34 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   const config = typeConfig[project.project_type] || typeConfig.other;
 
   return (
-    <article className={`brutal-card brutal-card-hover ${config.cardClass} p-0 overflow-hidden group`}>
+    <article className={`brutal-card brutal-card-hover ${config.cardClass} ${coverImage ? '' : 'project-card-no-image'} p-0 overflow-hidden group`}>
       {/* صورة الغلاف من project_media في قاعدة البيانات */}
-      <div className={`project-card-cover bg-gradient-to-br ${config.gradient} border-b-3 border-[#111111] flex items-center justify-center relative overflow-hidden`}>
-        {coverImage ? (
+      {coverImage && (
+        <div className={`project-card-cover bg-gradient-to-br ${config.gradient} border-b-3 border-[#111111] flex items-center justify-center relative overflow-hidden`}>
           <img
             src={coverImage}
             alt={`صورة مشروع ${project.title}`}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-        ) : (
-          <span className="text-sm font-bold text-[#111111]/45">لا توجد صورة مضافة</span>
-        )}
-        <span className={`absolute bottom-3 left-3 brutal-tag ${config.color} text-brutal-black`}>
-          {config.label}
-        </span>
-      </div>
+          <span className={`absolute bottom-3 left-3 brutal-tag ${config.color} text-brutal-black`}>
+            {config.label}
+          </span>
+        </div>
+      )}
 
       {/* محتوى الكرت */}
-      <div className="project-card-content p-6">
+      <div className={`project-card-content p-6 ${coverImage ? '' : 'project-card-content-no-image'}`}>
+        {!coverImage && (
+          <span className={`project-type-label brutal-tag ${config.color} text-brutal-black mb-3 self-start`}>
+            {config.label}
+          </span>
+        )}
         <h3 className="text-xl font-extrabold text-[#111111] mb-2 group-hover:text-mint-dark transition-colors">
           {project.title}
         </h3>
 
         {project.description && (
-          <p className="text-[#111111]/50 text-sm mb-5 line-clamp-2 leading-relaxed">
+          <p className="project-card-description text-[#111111]/50 text-sm mb-5 line-clamp-2 leading-relaxed">
             {project.description.substring(0, 120)}...
           </p>
         )}

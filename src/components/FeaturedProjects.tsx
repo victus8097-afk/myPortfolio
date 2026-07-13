@@ -67,29 +67,32 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                   : 'featured-project-card-tertiary';
 
             return (
-              <article key={project.id} className={`brutal-card brutal-card-hover featured-project-card ${config.cardClass} ${placement} p-0 overflow-hidden group`}>
-                <div className={`featured-project-card-media bg-gradient-to-br ${config.gradient} border-b-3 border-brutal-black flex items-center justify-center relative overflow-hidden`}>
-                  {coverImage ? (
+              <article key={project.id} className={`brutal-card brutal-card-hover featured-project-card ${config.cardClass} ${placement} ${coverImage ? '' : 'featured-project-card-no-image'} p-0 overflow-hidden group`}>
+                {coverImage && (
+                  <div className={`featured-project-card-media bg-gradient-to-br ${config.gradient} border-b-3 border-brutal-black flex items-center justify-center relative overflow-hidden`}>
                     <img
                       src={coverImage}
                       alt={`صورة مشروع ${project.title}`}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
-                  ) : (
-                    <div className="featured-project-no-image">لا توجد صورة مضافة</div>
-                  )}
-                  <span className={`absolute bottom-3 left-3 brutal-tag ${config.color} text-brutal-black`}>
-                    {config.label}
-                  </span>
-                </div>
+                    <span className={`absolute bottom-3 left-3 brutal-tag ${config.color} text-brutal-black`}>
+                      {config.label}
+                    </span>
+                  </div>
+                )}
 
-                <div className="featured-project-card-content p-6">
+                <div className={`featured-project-card-content p-6 ${coverImage ? '' : 'featured-project-card-content-no-image'}`}>
+                  {!coverImage && (
+                    <span className={`featured-project-type-label brutal-tag ${config.color} text-brutal-black mb-3 self-start`}>
+                      {config.label}
+                    </span>
+                  )}
                   <h3 className="text-xl font-extrabold text-brutal-black mb-2 group-hover:text-mint-dark transition-colors">
                     {project.title}
                   </h3>
 
                   {project.description && (
-                    <p className="text-brutal-black/50 text-sm mb-5 line-clamp-2 leading-relaxed">
+                    <p className="featured-project-description text-brutal-black/50 text-sm mb-5 line-clamp-2 leading-relaxed">
                       {project.description.substring(0, 120)}...
                     </p>
                   )}

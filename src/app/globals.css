@@ -328,7 +328,7 @@ body {
 }
 
 .featured-project-card-media {
-  height: 12.5rem;
+  height: 10.75rem;
   border-bottom-color: var(--color-brutal-black) !important;
 }
 
@@ -369,7 +369,7 @@ html[dir="rtl"] .project-card-type-other.brutal-card-hover:hover {
 }
 
 .project-card-cover {
-  height: 12.5rem;
+  height: 10.75rem;
   border-bottom-color: var(--color-brutal-black) !important;
 }
 
@@ -383,6 +383,21 @@ html[dir="rtl"] .project-card-type-other.brutal-card-hover:hover {
 
 .featured-project-card-content > .brutal-btn {
   margin-top: auto;
+}
+
+.featured-project-card-no-image {
+  align-self: start;
+  height: auto;
+}
+
+.featured-project-card-content-no-image {
+  padding-top: 1.25rem;
+}
+
+.featured-project-description,
+.project-card-description {
+  margin-top: 0.5rem;
+  line-height: 1.85;
 }
 
 .featured-projects-cta-wrap {
@@ -426,7 +441,7 @@ html[dir="rtl"] .featured-projects-cta:hover {
 
   .featured-project-card-primary .featured-project-card-media,
   .featured-project-card-media {
-    height: 13rem;
+    height: 10.75rem;
   }
 
   .featured-projects-cta {
@@ -483,10 +498,15 @@ html[dir="rtl"] .featured-projects-cta:hover {
   height: 100%;
 }
 
+.projects-grid > .project-card-no-image {
+  height: auto;
+  align-self: start;
+}
+
 .project-card-cover {
-  flex: 0 0 12.5rem;
-  min-height: 12.5rem;
-  height: 12.5rem !important;
+  flex: 0 0 10.75rem;
+  min-height: 10.75rem;
+  height: 10.75rem !important;
 }
 
 .project-card-content {
@@ -497,6 +517,10 @@ html[dir="rtl"] .featured-projects-cta:hover {
 
 .project-card-content > .brutal-btn {
   margin-top: auto;
+}
+
+.project-card-content-no-image {
+  padding-top: 1.25rem;
 }
 
 .project-detail-toolbar {
