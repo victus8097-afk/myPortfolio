@@ -8,11 +8,36 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { ProjectType } from '@/types';
 
-const filterOptions: { label: string; value: ProjectType | 'all' }[] = [
-  { label: 'كل الأعمال', value: 'all' },
-  { label: 'تطبيقات جوال', value: 'mobile_app' },
-  { label: 'مواقع ويب', value: 'web_app' },
-  { label: 'أعمال أخرى', value: 'other' },
+const filterOptions: {
+  label: string;
+  value: ProjectType | 'all';
+  activeClass: string;
+  idleClass: string;
+}[] = [
+  {
+    label: 'كل الأعمال',
+    value: 'all',
+    activeClass: 'bg-mint',
+    idleClass: 'bg-white hover:bg-mint/20',
+  },
+  {
+    label: 'تطبيقات جوال',
+    value: 'mobile_app',
+    activeClass: 'bg-warm',
+    idleClass: 'bg-warm/15 hover:bg-warm/40',
+  },
+  {
+    label: 'مواقع ويب',
+    value: 'web_app',
+    activeClass: 'bg-sky',
+    idleClass: 'bg-sky/15 hover:bg-sky/40',
+  },
+  {
+    label: 'أعمال أخرى',
+    value: 'other',
+    activeClass: 'bg-purple',
+    idleClass: 'bg-purple/15 hover:bg-purple/40',
+  },
 ];
 
 export default function FilterBar() {
@@ -38,9 +63,7 @@ export default function FilterBar() {
           key={option.value}
           onClick={() => handleFilter(option.value)}
           className={`brutal-btn text-sm ${
-            currentType === option.value
-              ? 'brutal-btn-mint'
-              : 'bg-white hover:bg-gray-50'
+            currentType === option.value ? option.activeClass : option.idleClass
           }`}
         >
           {option.label}
