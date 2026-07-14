@@ -78,6 +78,10 @@ export default function MediaSlider({ media }: MediaSliderProps) {
   const isLoading = loadedMediaId !== currentMedia.id && !mediaError;
 
   const openLightbox = () => {
+    if (currentMedia.media_type === 'video' && videoRef.current) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
     setLightboxZoom(1);
     setLightboxPan({ x: 0, y: 0 });
     setLightboxOpen(true);
