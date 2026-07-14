@@ -2,12 +2,12 @@
 
 // ============================================================
 // MediaSlider.tsx — معرض الصور والفيديوهات
-// Client Component: عرض الوسائط بترتيب الفيديوهات أولاً
+// Client Component: الفيديوهات أولاً مع تحميل خلفي للوسائط
 // ============================================================
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ProjectMedia } from '@/types';
-import { ChevronLeft, ChevronRight, Play, Pause, X, Maximize2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, Pause, X, Maximize2, Download } from 'lucide-react';
 
 interface MediaSliderProps {
   media: ProjectMedia[];
@@ -24,6 +24,39 @@ export default function MediaSlider({ media }: MediaSliderProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  const orderedMedia = useMemo(
+    () => [...media].sort((a, b) => {
+      if (a.media_type !== b.media_type) return a.media_type === 'video' ? -1 : 1;
+      return a.sort_order - b.sort_order;
+    }),
+    [media],
+  );
+
+  // تحميل الصور في الخلفية، وطلب بيانات الفيديوهات بالتتابع كل خمس ثوانٍ.
+  useEffect(() => {
+    const images = orderedMedia.filter((item) => item.media_type === 'image');
+    images.forEach((item) => {
+      const image = new window.Image();
+      image.src = item.media_url;
+    });
+
+    const videos = orderedMedia.filter((item) => item.media_type === 'video');
+    let nextVideo = 0;
+    const preloadVideo = () => {
+      const item = videos[nextVideo];
+      if (!item) return;
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.src = item.media_url;
+      video.load();
+      nextVideo += 1;
+    };
+
+    preloadVideo();
+    const interval = window.setInterval(preloadVideo, 5000);
+    return () => window.clearInterval(interval);
+  }, [orderedMedia]);
+
   useEffect(() => {
     if (!lightboxOpen) return;
     const previousOverflow = document.body.style.overflow;
@@ -32,6 +65,17 @@ export default function MediaSlider({ media }: MediaSliderProps) {
       document.body.style.overflow = previousOverflow;
     };
   }, [lightboxOpen]);
+
+  if (orderedMedia.length === 0) {
+    return (
+      <div className="project-media-empty brutal-card h-64 flex items-center justify-center bg-brutal-gray">
+        <p className="text-sm font-bold text-[#111111]/45">لا توجد وسائط مضافة لهذا العمل</p>
+      </div>
+    );
+  }
+
+  const currentMedia = orderedMedia[currentIndex];
+  const isLoading = loadedMediaId !== currentMedia.id && !mediaError;
 
   const openLightbox = () => {
     setLightboxZoom(1);
@@ -43,6 +87,28 @@ export default function MediaSlider({ media }: MediaSliderProps) {
     setLightboxZoom(1);
     setLightboxPan({ x: 0, y: 0 });
     setLightboxOpen(false);
+  };
+
+  const selectMedia = (index: number) => {
+    setCurrentIndex(index);
+    setIsPlaying(false);
+    setMediaError(false);
+    closeLightbox();
+  };
+
+  const goToPrev = () => {
+    selectMedia(currentIndex === 0 ? orderedMedia.length - 1 : currentIndex - 1);
+  };
+
+  const goToNext = () => {
+    selectMedia(currentIndex === orderedMedia.length - 1 ? 0 : currentIndex + 1);
+  };
+
+  const toggleVideoPlay = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) videoRef.current.pause();
+    else videoRef.current.play();
+    setIsPlaying(!isPlaying);
   };
 
   const handleLightboxWheel = (event: React.WheelEvent<HTMLDivElement>) => {
@@ -83,42 +149,22 @@ export default function MediaSlider({ media }: MediaSliderProps) {
     }
   };
 
-  const orderedMedia = [...media].sort((a, b) => {
-    if (a.media_type !== b.media_type) return a.media_type === 'video' ? -1 : 1;
-    return a.sort_order - b.sort_order;
-  });
-
-  if (orderedMedia.length === 0) {
-    return (
-      <div className="project-media-empty brutal-card h-64 flex items-center justify-center bg-brutal-gray">
-        <p className="text-sm font-bold text-[#111111]/45">لا توجد وسائط مضافة لهذا العمل</p>
-      </div>
-    );
-  }
-
-  const currentMedia = orderedMedia[currentIndex];
-  const isLoading = loadedMediaId !== currentMedia.id && !mediaError;
-
-  const selectMedia = (index: number) => {
-    setCurrentIndex(index);
-    setIsPlaying(false);
-    setMediaError(false);
-    closeLightbox();
-  };
-
-  const goToPrev = () => {
-    selectMedia(currentIndex === 0 ? orderedMedia.length - 1 : currentIndex - 1);
-  };
-
-  const goToNext = () => {
-    selectMedia(currentIndex === orderedMedia.length - 1 ? 0 : currentIndex + 1);
-  };
-
-  const toggleVideoPlay = () => {
-    if (!videoRef.current) return;
-    if (isPlaying) videoRef.current.pause();
-    else videoRef.current.play();
-    setIsPlaying(!isPlaying);
+  const handleDownload = async () => {
+    const extension = currentMedia.media_type === 'video' ? 'mp4' : 'jpg';
+    const fileName = `work-media-${currentMedia.id}.${extension}`;
+    try {
+      const response = await fetch(currentMedia.media_url);
+      if (!response.ok) throw new Error('Download failed');
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = objectUrl;
+      link.download = fileName;
+      link.click();
+      URL.revokeObjectURL(objectUrl);
+    } catch {
+      window.open(currentMedia.media_url, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (
@@ -128,10 +174,15 @@ export default function MediaSlider({ media }: MediaSliderProps) {
           <span className="text-white text-xs font-bold">
             {currentMedia.media_type === 'video' ? 'فيديو' : 'صورة'} — {currentIndex + 1} / {orderedMedia.length}
           </span>
-          {currentMedia.media_type === 'image' && !isLoading && !mediaError && (
-            <button type="button" onClick={openLightbox} className="text-white/70 hover:text-white" aria-label="تكبير الصورة">
-              <Maximize2 size={16} />
-            </button>
+          {!isLoading && !mediaError && (
+            <div className="flex items-center gap-3">
+              <button type="button" onClick={handleDownload} className="text-white/70 hover:text-white" aria-label="تنزيل الوسيطة">
+                <Download size={16} />
+              </button>
+              <button type="button" onClick={openLightbox} className="text-white/70 hover:text-white" aria-label="عرض الوسيطة بحجم كبير">
+                <Maximize2 size={16} />
+              </button>
+            </div>
           )}
         </div>
 
@@ -140,7 +191,7 @@ export default function MediaSlider({ media }: MediaSliderProps) {
             <button
               type="button"
               className="w-full h-full cursor-zoom-in disabled:cursor-default"
-onClick={openLightbox}
+              onClick={openLightbox}
               disabled={isLoading || mediaError}
             >
               <img
@@ -157,6 +208,8 @@ onClick={openLightbox}
                 ref={videoRef}
                 src={currentMedia.media_url}
                 className="w-full h-full object-contain"
+                preload="auto"
+                playsInline
                 onLoadedData={() => setLoadedMediaId(currentMedia.id)}
                 onError={() => setMediaError(true)}
                 onEnded={() => setIsPlaying(false)}
@@ -185,12 +238,7 @@ onClick={openLightbox}
         </button>
         <div className="flex gap-2">
           {orderedMedia.map((item, index) => (
-            <button
-              key={item.id}
-              onClick={() => selectMedia(index)}
-              className={`media-slider-dot ${index === currentIndex ? 'is-active' : ''}`}
-              aria-label={`عرض الوسيطة ${index + 1}`}
-            />
+            <button key={item.id} onClick={() => selectMedia(index)} className={`media-slider-dot ${index === currentIndex ? 'is-active' : ''}`} aria-label={`عرض الوسيطة ${index + 1}`} />
           ))}
         </div>
         <button onClick={goToNext} className="media-slider-control" aria-label="الوسائط التالية">
@@ -198,29 +246,30 @@ onClick={openLightbox}
         </button>
       </div>
 
-      {lightboxOpen && currentMedia.media_type === 'image' && !mediaError && (
-        <div
-          className="project-media-lightbox fixed inset-0 z-[80] flex items-center justify-center p-4"
-          onClick={closeLightbox}
-          onWheel={handleLightboxWheel}
-        >
+      {lightboxOpen && !mediaError && (
+        <div className="project-media-lightbox fixed inset-0 z-[80] flex items-center justify-center p-4" onClick={closeLightbox} onWheel={currentMedia.media_type === 'image' ? handleLightboxWheel : undefined}>
           <div className="media-lightbox-content" onClick={(event) => event.stopPropagation()}>
-            <img
-              src={currentMedia.media_url}
-              alt={`صورة العمل ${currentIndex + 1} بالحجم الكامل`}
-              className="media-lightbox-image object-contain border-4 border-white shadow-[8px_8px_0px_#0F0F0F]"
-              style={{ transform: `translate(${lightboxPan.x}px, ${lightboxPan.y}px) scale(${lightboxZoom})` }}
-              onPointerDown={handleLightboxPointerDown}
-              onPointerMove={handleLightboxPointerMove}
-              onPointerUp={stopLightboxDragging}
-              onPointerCancel={stopLightboxDragging}
-              onWheel={handleLightboxWheel}
-            />
+            {currentMedia.media_type === 'image' ? (
+              <img
+                src={currentMedia.media_url}
+                alt={`صورة العمل ${currentIndex + 1} بالحجم الكامل`}
+                className="media-lightbox-image object-contain border-4 border-white shadow-[8px_8px_0px_#0F0F0F]"
+                style={{ transform: `translate(${lightboxPan.x}px, ${lightboxPan.y}px) scale(${lightboxZoom})` }}
+                onPointerDown={handleLightboxPointerDown}
+                onPointerMove={handleLightboxPointerMove}
+                onPointerUp={stopLightboxDragging}
+                onPointerCancel={stopLightboxDragging}
+                onWheel={handleLightboxWheel}
+              />
+            ) : (
+              <video src={currentMedia.media_url} className="media-lightbox-video" controls autoPlay playsInline />
+            )}
             <div className="media-lightbox-toolbar">
-              مرّر عجلة الماوس للتكبير، واسحب الصورة بعد التكبير — {Math.round(lightboxZoom * 100)}%
+              {currentMedia.media_type === 'image' ? `مرّر عجلة الماوس للتكبير — ${Math.round(lightboxZoom * 100)}%` : 'يمكنك تشغيل الفيديو والتحكم به من هنا'}
+              <button type="button" onClick={handleDownload} className="media-lightbox-download"><Download size={15} /> تنزيل</button>
             </div>
           </div>
-          <button type="button" onClick={closeLightbox} className="absolute top-5 right-5 media-lightbox-close" aria-label="إغلاق الصورة">
+          <button type="button" onClick={closeLightbox} className="absolute top-5 right-5 media-lightbox-close" aria-label="إغلاق الوسيطة">
             <X size={22} />
           </button>
         </div>

@@ -650,6 +650,11 @@ html[dir="rtl"] .featured-projects-cta:hover {
 
 .media-lightbox-toolbar {
   position: static;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
   padding: 0.4rem 0.7rem;
   border: 2px solid white;
   border-radius: 0.5rem;
@@ -658,6 +663,19 @@ html[dir="rtl"] .featured-projects-cta:hover {
   font-size: 0.75rem;
   font-weight: 800;
   text-align: center;
+}
+
+.media-lightbox-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.5rem;
+  border: 2px solid white;
+  border-radius: 0.4rem;
+  background: var(--color-mint);
+  color: var(--color-brutal-black);
+  font-size: 0.7rem;
+  font-weight: 800;
 }
 
 .media-lightbox-image {
@@ -672,6 +690,11 @@ html[dir="rtl"] .featured-projects-cta:hover {
 
 .media-lightbox-image:active {
   cursor: grabbing;
+}
+
+.media-lightbox-video {
+  max-width: 90vw;
+  max-height: 78vh;
 }
 
 .media-lightbox-close {
