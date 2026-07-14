@@ -62,6 +62,7 @@ type UploadProgress = {
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [stats, setStats] = useState<DashboardStats>({
     totalProjects: 0,
     totalSkills: 0,
@@ -82,12 +83,19 @@ export default function DashboardPage() {
   // جلب البيانات
   const fetchData = useCallback(async () => {
     try {
-      const [projectsRes, skillsRes, channelsRes, profileRes] = await Promise.all([
+      const dataRequest = Promise.all([
         supabase.from('projects').select('*, project_media(*)').order('created_at', { ascending: false }),
         supabase.from('skills').select('*').order('sort_order', { ascending: true }),
         supabase.from('contact_channels').select('*'),
         supabase.from('profile_settings').select('*').single(),
       ]);
+      const dataTimeout = new Promise<never>((_, reject) => {
+        window.setTimeout(() => reject(new Error('انتهت مهلة تحميل بيانات لوحة التحكم')), 15000);
+      });
+      const [projectsRes, skillsRes, channelsRes, profileRes] = await Promise.race([dataRequest, dataTimeout]);
+
+      const firstError = [projectsRes.error, skillsRes.error, channelsRes.error, profileRes.error].find(Boolean);
+      if (firstError) throw firstError;
 
       const projectData = (projectsRes.data as Project[]) || [];
       const skillData = (skillsRes.data as Skill[]) || [];
@@ -106,22 +114,40 @@ export default function DashboardPage() {
       });
     } catch (error) {
       console.error('Error fetching data:', error);
+      setLoadError(error instanceof Error ? error.message : 'تعذر تحميل بيانات لوحة التحكم');
     } finally {
       setIsLoading(false);
     }
   }, [supabase]);
 
   useEffect(() => {
-    // التحقق من المصادقة
+    let cancelled = false;
+    // التحقق من المصادقة مع مهلة واضحة حتى لا تبقى الصفحة في حالة تحميل دائمة.
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        window.location.href = '/sys-gate-hq-99x';
-        return;
+      try {
+        const sessionRequest = supabase.auth.getSession();
+        const timeout = new Promise<never>((_, reject) => {
+          window.setTimeout(() => reject(new Error('انتهت مهلة الاتصال بـ Supabase')), 10000);
+        });
+        const { data: { session } } = await Promise.race([sessionRequest, timeout]);
+
+        if (!session) {
+          window.location.href = '/sys-gate-hq-99x';
+          return;
+        }
+        if (!cancelled) await fetchData();
+      } catch (error) {
+        console.error('Dashboard initialization error:', error);
+        if (!cancelled) {
+          setLoadError(error instanceof Error ? error.message : 'تعذر تهيئة لوحة التحكم');
+          setIsLoading(false);
+        }
       }
-      fetchData();
     };
     checkAuth();
+    return () => {
+      cancelled = true;
+    };
   }, [supabase, fetchData]);
 
   const handleLogout = async () => {
@@ -136,6 +162,21 @@ export default function DashboardPage() {
     { id: 'settings', label: 'الإعدادات', icon: <Settings size={18} /> },
     { id: 'security', label: 'الأمان', icon: <Shield size={18} /> },
   ];
+
+  if (loadError) {
+    return (
+      <main className="dashboard-shell min-h-screen flex items-center justify-center p-6">
+        <div className="dashboard-loading brutal-card p-8 text-center max-w-md">
+          <h1 className="text-xl font-black text-[#111111] mb-3">تعذر تحميل لوحة التحكم</h1>
+          <p className="text-sm text-[#111111]/60 leading-relaxed mb-6">{loadError}</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button onClick={() => window.location.reload()} className="brutal-btn brutal-btn-mint text-sm">إعادة المحاولة</button>
+            <a href="/sys-gate-hq-99x" className="brutal-btn bg-white text-sm">تسجيل الدخول من جديد</a>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   if (isLoading) {
     return (
