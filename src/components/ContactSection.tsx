@@ -30,10 +30,15 @@ export default function ContactSection({ channels }: ContactSectionProps) {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* العنوان */}
         <div className="text-center mb-12">
+          <div className="featured-heading-mark mb-5" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-brutal-black mb-4">
             لنبني شيئاً معاً
           </h2>
-          <p className="text-brutal-black/45 text-lg max-w-xl mx-auto">
+          <p className="text-brutal-black/65 text-lg max-w-xl mx-auto">
             هل لديك مشروع أو فكرة؟ لا تتردد في التواصل معي
           </p>
         </div>

@@ -30,7 +30,7 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-brutal-black mb-4">
             أعمال بارزة
           </h2>
-          <p className="text-brutal-black/45 text-lg max-w-xl mx-auto">نماذج من أفضل الأعمال التي أنجزتها</p>
+          <p className="text-brutal-black/65 text-lg max-w-xl mx-auto">نماذج من أفضل الأعمال التي أنجزتها</p>
         </div>
 
         {/* البطاقات — معلومات أساسية فقط */}
@@ -96,7 +96,6 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
 
         {featured.length > 0 && (
           <div className="featured-projects-cta-wrap text-center mt-12">
-            <p className="featured-projects-cta-label">اكتشف جميع الأعمال والتفاصيل</p>
             <Link href="/projects" className="brutal-btn brutal-btn-coral featured-projects-cta text-base px-10 py-3.5">
               عرض جميع الأعمال <span aria-hidden="true">←</span>
             </Link>

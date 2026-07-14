@@ -41,7 +41,12 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* العنوان */}
-        <div className="text-center mb-14">
+        <div className="text-center mb-12">
+          <div className="featured-heading-mark mb-5" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-brutal-black mb-4">
             الأدوات والتقنيات
           </h2>
