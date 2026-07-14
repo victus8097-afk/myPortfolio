@@ -53,7 +53,15 @@ export default function Navbar() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+    const target = document.querySelector(href);
+    if (!target) return;
+
+    // احسب ارتفاع النافبار عشان ما يخبي السكشن
+    const navbar = document.querySelector('nav');
+    const navbarHeight = navbar ? navbar.getBoundingClientRect().height : 0;
+    const targetPosition = target.getBoundingClientRect().top + window.scrollY - navbarHeight - 8; // 8px مسافة إضافية
+
+    window.scrollTo({ top: targetPosition, behavior: 'smooth' });
   };
 
   const handleNavigation = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
