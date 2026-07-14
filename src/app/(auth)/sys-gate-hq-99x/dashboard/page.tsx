@@ -133,8 +133,17 @@ export default function DashboardPage() {
   }, [fetchData]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = '/sys-gate-hq-99x';
+    try {
+      const signOutRequest = supabase.auth.signOut({ scope: 'global' });
+      await Promise.race([
+        signOutRequest,
+        new Promise((resolve) => window.setTimeout(resolve, 3000)),
+      ]);
+    } finally {
+      // local scope يضمن إزالة الجلسة من المتصفح حتى لو تعطل طلب الخادم.
+      await supabase.auth.signOut({ scope: 'local' }).catch(() => undefined);
+      window.location.replace('/sys-gate-hq-99x');
+    }
   };
 
   const tabs: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
@@ -509,6 +518,16 @@ function ProjectFormModal({
     return btoa(Array.from(bytes, (byte) => String.fromCharCode(byte)).join(''));
   };
 
+  const fetchWithTimeout = async (input: RequestInfo | URL, init: RequestInit, timeoutMs: number) => {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      return await fetch(input, { ...init, signal: controller.signal });
+    } finally {
+      window.clearTimeout(timer);
+    }
+  };
+
   const uploadVideoResumable = async (filePath: string, file: File, onProgress: (percent: number) => void) => {
     let { data: { session } } = await supabase.auth.getSession();
     if (!session) session = (await supabase.auth.refreshSession()).data.session;
@@ -525,7 +544,7 @@ function ProjectFormModal({
       `contentType ${encodeMetadata(file.type || 'video/mp4')}`,
     ].join(',');
 
-    const createResponse = await fetch(`${supabaseUrl}/storage/v1/upload/resumable`, {
+    const createResponse = await fetchWithTimeout(`${supabaseUrl}/storage/v1/upload/resumable`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${session.access_token}`,
@@ -535,7 +554,7 @@ function ProjectFormModal({
         'Upload-Metadata': metadata,
         'x-upsert': 'false',
       },
-    });
+    }, 30000);
 
     if (!createResponse.ok) {
       throw new Error(`تعذر بدء رفع الفيديو (${createResponse.status})`);
@@ -549,7 +568,7 @@ function ProjectFormModal({
 
     while (offset < file.size) {
       const chunk = file.slice(offset, Math.min(offset + chunkSize, file.size));
-      const response = await fetch(uploadUrl, {
+      const response = await fetchWithTimeout(uploadUrl, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${session.access_token}`,
@@ -559,7 +578,7 @@ function ProjectFormModal({
           'Content-Type': 'application/offset+octet-stream',
         },
         body: chunk,
-      });
+      }, 120000);
 
       if (!response.ok) throw new Error(`توقف رفع الفيديو (${response.status})`);
       const nextOffset = Number(response.headers.get('Upload-Offset'));
@@ -580,15 +599,29 @@ function ProjectFormModal({
     const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
     const filePath = `${projectId}/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
     const mediaType = getUploadMediaType(file) || 'image';
+    let uploadedPath = filePath;
     if (mediaType === 'video') {
-      await uploadVideoResumable(filePath, file, onProgress);
+      try {
+        await uploadVideoResumable(filePath, file, onProgress);
+      } catch (resumableError) {
+        // بديل عملي إذا لم يكن Endpoint الـ TUS متاحاً في مشروع Supabase.
+        uploadedPath = `${projectId}/standard-${Date.now()}-${crypto.randomUUID()}-${safeName}`;
+        const { error: fallbackError } = await supabase.storage
+          .from(MEDIA_BUCKET)
+          .upload(uploadedPath, file, { contentType: file.type || 'video/mp4', upsert: false });
+        if (fallbackError) {
+          const reason = resumableError instanceof Error ? resumableError.message : 'فشل الرفع المتجزئ';
+          throw new Error(`${reason}. الرفع البديل فشل أيضاً: ${fallbackError.message}`);
+        }
+        onProgress(100);
+      }
     } else {
       await uploadObjectWithProgress(filePath, file, onProgress);
     }
 
     const { data: publicFile } = supabase.storage
       .from(MEDIA_BUCKET)
-      .getPublicUrl(filePath);
+      .getPublicUrl(uploadedPath);
     const { error: mediaError } = await supabase.from('project_media').insert({
       project_id: projectId,
       media_url: publicFile.publicUrl,
