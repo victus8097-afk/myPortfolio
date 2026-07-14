@@ -504,6 +504,73 @@ function ProjectFormModal({
     });
   };
 
+  const encodeMetadata = (value: string) => {
+    const bytes = new TextEncoder().encode(value);
+    return btoa(Array.from(bytes, (byte) => String.fromCharCode(byte)).join(''));
+  };
+
+  const uploadVideoResumable = async (filePath: string, file: File, onProgress: (percent: number) => void) => {
+    let { data: { session } } = await supabase.auth.getSession();
+    if (!session) session = (await supabase.auth.refreshSession()).data.session;
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!session?.access_token || !supabaseUrl || !supabaseKey) {
+      throw new Error('انتهت جلسة الدخول. أعد تسجيل الدخول ثم حاول رفع الفيديو مرة أخرى');
+    }
+
+    const metadata = [
+      `bucketName ${encodeMetadata(MEDIA_BUCKET)}`,
+      `objectName ${encodeMetadata(filePath)}`,
+      `contentType ${encodeMetadata(file.type || 'video/mp4')}`,
+    ].join(',');
+
+    const createResponse = await fetch(`${supabaseUrl}/storage/v1/upload/resumable`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        apikey: supabaseKey,
+        'Tus-Resumable': '1.0.0',
+        'Upload-Length': String(file.size),
+        'Upload-Metadata': metadata,
+        'x-upsert': 'false',
+      },
+    });
+
+    if (!createResponse.ok) {
+      throw new Error(`تعذر بدء رفع الفيديو (${createResponse.status})`);
+    }
+
+    const locationHeader = createResponse.headers.get('Location');
+    if (!locationHeader) throw new Error('لم يتم إنشاء مسار رفع الفيديو');
+    const uploadUrl = new URL(locationHeader, supabaseUrl).toString();
+    const chunkSize = 6 * 1024 * 1024;
+    let offset = 0;
+
+    while (offset < file.size) {
+      const chunk = file.slice(offset, Math.min(offset + chunkSize, file.size));
+      const response = await fetch(uploadUrl, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          apikey: supabaseKey,
+          'Tus-Resumable': '1.0.0',
+          'Upload-Offset': String(offset),
+          'Content-Type': 'application/offset+octet-stream',
+        },
+        body: chunk,
+      });
+
+      if (!response.ok) throw new Error(`توقف رفع الفيديو (${response.status})`);
+      const nextOffset = Number(response.headers.get('Upload-Offset'));
+      if (!Number.isFinite(nextOffset) || nextOffset <= offset) {
+        throw new Error('تعذر متابعة رفع الفيديو');
+      }
+      offset = nextOffset;
+      onProgress(Math.round((offset / file.size) * 100));
+    }
+  };
+
   const uploadOneFile = async (
     projectId: string,
     file: File,
@@ -513,7 +580,11 @@ function ProjectFormModal({
     const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
     const filePath = `${projectId}/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
     const mediaType = getUploadMediaType(file) || 'image';
-    await uploadObjectWithProgress(filePath, file, onProgress);
+    if (mediaType === 'video') {
+      await uploadVideoResumable(filePath, file, onProgress);
+    } else {
+      await uploadObjectWithProgress(filePath, file, onProgress);
+    }
 
     const { data: publicFile } = supabase.storage
       .from(MEDIA_BUCKET)
