@@ -3,6 +3,7 @@
 // ============================================================
 
 import type { Project } from '@/types';
+import { generateSlug } from '@/lib/slug';
 import Link from 'next/link';
 
 interface FeaturedProjectsProps {
@@ -45,9 +46,13 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                   : 'featured-project-card-tertiary';
 
             return (
-              <article
+              <Link
                 key={project.id}
-                className={`brutal-card brutal-card-hover featured-project-card ${placement} ${coverImage ? '' : 'featured-project-card-no-image'} p-0 overflow-hidden group`}
+                href={`/projects/${slug}`}
+                className={`featured-project-card-link ${placement}`}
+              >
+              <article
+                className={`brutal-card brutal-card-hover featured-project-card ${coverImage ? '' : 'featured-project-card-no-image'} p-0 overflow-hidden group`}
               >
                 {coverImage && (
                   <div className="featured-project-card-media bg-brutal-gray border-b-3 border-brutal-black flex items-center justify-center relative overflow-hidden">
@@ -70,11 +75,12 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                     </p>
                   )}
 
-                  <Link href={`/projects/${slug}`} className="brutal-btn brutal-btn-warm w-full text-sm">
+                  <span className="brutal-btn brutal-btn-warm w-full text-sm">
                     عرض التفاصيل ←
-                  </Link>
+                  </span>
                 </div>
               </article>
+              </Link>
             );
           })}
         </div>
@@ -112,8 +118,4 @@ function getCoverImage(project: Project): string | null {
 function getShortDescription(description: string): string {
   const limit = 110;
   return description.length > limit ? `${description.substring(0, limit)}...` : description;
-}
-
-function generateSlug(title: string): string {
-  return title.toLowerCase().replace(/[^\w\s\u0600-\u06FF-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
 }

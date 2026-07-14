@@ -4,6 +4,7 @@
 // ============================================================
 
 import type { Project } from '@/types';
+import { generateSlug } from '@/lib/slug';
 import Link from 'next/link';
 
 interface ProjectCardProps {
@@ -11,16 +12,12 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
-  const slug = project.title
-    .toLowerCase()
-    .replace(/[^\w\s\u0600-\u06FF-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim();
+  const slug = generateSlug(project.title);
   const coverImage = getCoverImage(project);
 
   return (
-    <article className={`brutal-card brutal-card-hover featured-project-card ${coverImage ? '' : 'featured-project-card-no-image'} p-0 overflow-hidden group`}>
+    <Link href={`/projects/${slug}`} className="featured-project-card-link">
+      <article className={`brutal-card brutal-card-hover featured-project-card ${coverImage ? '' : 'featured-project-card-no-image'} p-0 overflow-hidden group`}>
       {/* صورة الغلاف من project_media في قاعدة البيانات */}
       {coverImage && (
         <div className="featured-project-card-media bg-brutal-gray border-b-3 border-brutal-black flex items-center justify-center relative overflow-hidden">
@@ -44,14 +41,12 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           </p>
         )}
 
-        <Link
-          href={`/projects/${slug}`}
-          className="brutal-btn brutal-btn-warm w-full text-sm"
-        >
+        <span className="brutal-btn brutal-btn-warm w-full text-sm">
           عرض التفاصيل ←
-        </Link>
+        </span>
       </div>
     </article>
+    </Link>
   );
 }
 

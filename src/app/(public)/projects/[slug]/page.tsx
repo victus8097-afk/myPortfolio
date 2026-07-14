@@ -11,6 +11,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 import ProjectMetaBox from '@/components/ProjectMetaBox';
 import MediaSliderWrapper from '@/components/MediaSliderWrapper';
 import BackToPrevious from '@/components/BackToPrevious';
+import { generateSlug } from '@/lib/slug';
 import type { Project, ProjectMedia } from '@/types';
 
 interface ProjectDetailPageProps {
@@ -43,15 +44,8 @@ async function getProjectBySlug(slug: string) {
 
   if (!projects) return null;
 
-  const project = (projects as Project[]).find((p) => {
-    const projectSlug = p.title
-      .toLowerCase()
-      .replace(/[^\w\s\u0600-\u06FF-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim();
-    return projectSlug === slug;
-  });
+  const decodedSlug = decodeURIComponent(slug);
+  const project = (projects as Project[]).find((p) => generateSlug(p.title) === decodedSlug);
 
   if (!project) return null;
 

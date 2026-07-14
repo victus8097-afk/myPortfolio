@@ -279,6 +279,14 @@ body {
   background: var(--color-mint);
 }
 
+.featured-project-card-link {
+  display: block;
+  min-width: 0;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
 .featured-projects-grid {
   width: 100%;
   max-width: 68rem;
@@ -504,13 +512,17 @@ html[dir="rtl"] .featured-projects-cta:hover {
   align-items: stretch;
 }
 
-.projects-grid > .brutal-card {
+.projects-grid > .featured-project-card-link {
+  height: 100%;
+}
+
+.projects-grid > .featured-project-card-link > .brutal-card {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
-.projects-grid > .featured-project-card-no-image {
+.projects-grid > .featured-project-card-link > .featured-project-card-no-image {
   height: auto;
 }
 
