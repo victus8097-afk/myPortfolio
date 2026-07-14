@@ -11,7 +11,10 @@ export const metadata: Metadata = {
   description: 'بورتفوليو خالد عبدالرحمن — استعراض الهوية المهنية والمهارات التقنية ومعرض الأعمال',
   keywords: ['portfolio', 'بورتفوليو', 'خالد عبدالرحمن', 'مطور', 'أعمال', 'مهارات'],
   icons: {
-    icon: '/icon.png',
+    icon: [
+      { url: '/favicon.ico', sizes: '1024x1046', type: 'image/png' },
+    ],
+    apple: '/apple-touch-icon.png',
   },
 };
 
