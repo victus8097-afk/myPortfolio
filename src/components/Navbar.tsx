@@ -73,7 +73,7 @@ export default function Navbar() {
         >
           {/* اليمين: الشعار */}
           <a
-            href={isHomePage ? '#hero' : '/'}
+            href={isHomePage ? '#hero' : '/#hero'}
             onClick={(event) => handleNavigation(event, '#hero')}
             className="flex items-center gap-2 shrink-0"
           >

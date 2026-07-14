@@ -10,8 +10,11 @@ export default function ScrollPositionManager() {
 
   useEffect(() => {
     const storageKey = `${STORAGE_PREFIX}${pathname}`;
-    const hash = window.location.hash;
+    const savePosition = () => {
+      sessionStorage.setItem(storageKey, String(window.scrollY));
+    };
 
+    const hash = window.location.hash;
     if (hash) {
       requestAnimationFrame(() => {
         if (hash === '#hero') {
@@ -30,14 +33,21 @@ export default function ScrollPositionManager() {
       }
     }
 
-    const savePosition = () => {
-      sessionStorage.setItem(storageKey, String(window.scrollY));
+    // حفظ الموضع لحظة ضغط رابط داخلي، قبل أن ينتقل Next.js إلى الصفحة الجديدة.
+    const saveBeforeNavigation = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      const link = target?.closest('a');
+      if (!link || link.origin !== window.location.origin) return;
+      if (link.pathname !== window.location.pathname) savePosition();
     };
 
     window.addEventListener('scroll', savePosition, { passive: true });
+    document.addEventListener('click', saveBeforeNavigation, true);
+
     return () => {
       savePosition();
       window.removeEventListener('scroll', savePosition);
+      document.removeEventListener('click', saveBeforeNavigation, true);
     };
   }, [pathname]);
 
