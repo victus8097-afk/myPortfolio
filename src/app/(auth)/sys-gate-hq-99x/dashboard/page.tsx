@@ -48,6 +48,8 @@ function getUploadMediaType(file: File): UploadMediaType | null {
   return null;
 }
 
+type BrowserSupabaseClient = ReturnType<typeof createClient>;
+
 type ActiveTab = 'overview' | 'projects' | 'skills' | 'settings' | 'security';
 
 type UploadProgress = {
@@ -196,6 +198,7 @@ export default function DashboardPage() {
           )}
           {activeTab === 'projects' && (
             <ProjectsTab
+              supabase={supabase}
               projects={projects}
               onRefresh={fetchData}
               showProjectForm={showProjectForm}
@@ -253,6 +256,7 @@ function OverviewTab({ stats }: { stats: DashboardStats }) {
 }
 
 function ProjectsTab({
+  supabase,
   projects,
   onRefresh,
   showProjectForm,
@@ -260,6 +264,7 @@ function ProjectsTab({
   editingProject,
   setEditingProject,
 }: {
+  supabase: BrowserSupabaseClient;
   projects: Project[];
   onRefresh: () => void;
   showProjectForm: boolean;
@@ -267,8 +272,6 @@ function ProjectsTab({
   editingProject: Project | null;
   setEditingProject: (v: Project | null) => void;
 }) {
-  const supabase = createClient();
-
   const handleDelete = async (id: string) => {
     if (!confirm('هل أنت متأكد من حذف هذا المشروع؟')) return;
     await supabase.from('projects').delete().eq('id', id);
@@ -368,6 +371,7 @@ function ProjectsTab({
       {/* نافذة إضافة/تعديل مشروع */}
       {showProjectForm && (
         <ProjectFormModal
+          supabase={supabase}
           project={editingProject}
           onClose={() => {
             setShowProjectForm(false);
@@ -381,15 +385,16 @@ function ProjectsTab({
 }
 
 function ProjectFormModal({
+  supabase,
   project,
   onClose,
   onSaved,
 }: {
+  supabase: BrowserSupabaseClient;
   project: Project | null;
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const supabase = createClient();
   const [form, setForm] = useState({
     title: project?.title || '',
     description: project?.description || '',
@@ -442,12 +447,17 @@ function ProjectFormModal({
     file: File,
     onProgress: (percent: number) => void,
   ) => {
-    const { data: { session } } = await supabase.auth.getSession();
+    let { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      const refreshed = await supabase.auth.refreshSession();
+      session = refreshed.data.session;
+    }
+
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     if (!session?.access_token || !supabaseUrl || !supabaseKey) {
-      throw new Error('تعذر التحقق من جلسة الدخول أو إعدادات Supabase');
+      throw new Error('انتهت جلسة الدخول. أعد تحميل لوحة التحكم ثم حاول مرة أخرى');
     }
 
     await new Promise<void>((resolve, reject) => {
