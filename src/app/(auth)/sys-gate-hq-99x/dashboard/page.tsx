@@ -399,81 +399,85 @@ function ProjectFormModal({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [cropFile, setCropFile] = useState<File | null>(null);
-  const [cropQueue, setCropQueue] = useState<File[]>([]);
+  const [pendingCoverFile, setPendingCoverFile] = useState<File | null>(null);
 
-  const startCropQueue = (files: File[]) => {
-    const [nextFile, ...remaining] = files;
-    if (!nextFile) return;
-    setCropFile(nextFile);
-    setCropQueue(remaining);
+  const handleCoverFile = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || getUploadMediaType(file) !== 'image') {
+      setError('اختر ملف صورة صالحاً ليكون غلاف العمل');
+      event.target.value = '';
+      return;
+    }
+    setError('');
+    setCropFile(file);
+    event.target.value = '';
   };
 
-  const handleFiles = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleMediaFiles = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []).filter((file) => getUploadMediaType(file));
-    const images = files.filter((file) => getUploadMediaType(file) === 'image');
-    const videos = files.filter((file) => getUploadMediaType(file) === 'video');
-
-    setPendingFiles((current) => [...current, ...videos]);
-    if (images.length > 0) {
-      if (cropFile) {
-        setCropQueue((current) => [...current, ...images]);
-      } else {
-        startCropQueue(images);
-      }
-    }
+    setPendingFiles((current) => [...current, ...files]);
     event.target.value = '';
   };
 
   const handleCropConfirmed = (croppedFile: File) => {
-    setPendingFiles((current) => [...current, croppedFile]);
-    if (cropQueue.length > 0) {
-      startCropQueue(cropQueue);
-    } else {
-      setCropFile(null);
-    }
+    setPendingCoverFile(croppedFile);
+    setCropFile(null);
   };
 
   const handleCropCancelled = () => {
-    if (cropQueue.length > 0) {
-      startCropQueue(cropQueue);
-    } else {
-      setCropFile(null);
-    }
+    setCropFile(null);
+  };
+
+  const uploadOneFile = async (projectId: string, file: File, sortOrder: number) => {
+    const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
+    const filePath = `${projectId}/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
+    const mediaType = getUploadMediaType(file) || 'image';
+    const { error: uploadError } = await supabase.storage
+      .from(MEDIA_BUCKET)
+      .upload(filePath, file, {
+        contentType: file.type || (mediaType === 'video' ? 'video/mp4' : 'image/jpeg'),
+        upsert: false,
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data: publicFile } = supabase.storage
+      .from(MEDIA_BUCKET)
+      .getPublicUrl(filePath);
+    const { error: mediaError } = await supabase.from('project_media').insert({
+      project_id: projectId,
+      media_url: publicFile.publicUrl,
+      media_type: mediaType,
+      sort_order: sortOrder,
+    });
+
+    if (mediaError) throw mediaError;
   };
 
   const uploadFiles = async (projectId: string) => {
-    if (pendingFiles.length === 0) return;
+    if (!pendingCoverFile && pendingFiles.length === 0) return;
 
     setUploading(true);
-    const uploadQueue = [
-      ...pendingFiles.filter((file) => getUploadMediaType(file) === 'image'),
-      ...pendingFiles.filter((file) => getUploadMediaType(file) === 'video'),
-    ];
     try {
-      for (const [index, file] of uploadQueue.entries()) {
-        const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
-        const filePath = `${projectId}/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
-        const mediaType = getUploadMediaType(file);
-        const { error: uploadError } = await supabase.storage
-          .from(MEDIA_BUCKET)
-          .upload(filePath, file, {
-            contentType: file.type || (mediaType === 'video' ? 'video/mp4' : 'image/jpeg'),
-            upsert: false,
-          });
+      let mediaStartOrder = mediaItems.length || 1;
 
-        if (uploadError) throw uploadError;
+      if (pendingCoverFile) {
+        // إزاحة الغلاف الحالي وجميع الوسائط خطوة واحدة قبل إضافة الغلاف الجديد.
+        await Promise.all(
+          mediaItems.map((item, index) =>
+            supabase.from('project_media').update({ sort_order: index + 1 }).eq('id', item.id)
+          )
+        );
+        await uploadOneFile(projectId, pendingCoverFile, 0);
+        mediaStartOrder = mediaItems.length + 1;
+      }
 
-        const { data: publicFile } = supabase.storage
-          .from(MEDIA_BUCKET)
-          .getPublicUrl(filePath);
-        const { error: mediaError } = await supabase.from('project_media').insert({
-          project_id: projectId,
-          media_url: publicFile.publicUrl,
-          media_type: mediaType || 'image',
-          sort_order: mediaItems.length + index,
-        });
-
-        if (mediaError) throw mediaError;
+      const mediaQueue = [
+        ...pendingFiles.filter((file) => getUploadMediaType(file) === 'image'),
+        ...pendingFiles.filter((file) => getUploadMediaType(file) === 'video'),
+      ];
+      for (const [index, file] of mediaQueue.entries()) {
+        await uploadOneFile(projectId, file, mediaStartOrder + index);
       }
     } finally {
       setUploading(false);
@@ -662,26 +666,44 @@ function ProjectFormModal({
             <div className="flex items-start justify-between gap-3 mb-3">
               <div>
                 <h4 className="font-black text-[#111111]">الصور والفيديوهات</h4>
-                <p className="text-xs text-[#111111]/50 mt-1">أول وسيطة بترتيب صفر تستخدم كغلاف للعمل.</p>
+                <p className="text-xs text-[#111111]/50 mt-1">الغلاف منفصل عن الوسائط، ويمكن تغييره في أي وقت.</p>
               </div>
               <span className="dashboard-media-count">{mediaItems.length} وسائط</span>
             </div>
 
-            <label className="dashboard-upload-zone">
-              <Upload size={22} />
-              <span className="font-bold">اختر صوراً أو فيديوهات</span>
-              <span className="text-xs text-[#111111]/50">يمكنك اختيار أكثر من ملف في نفس الوقت</span>
-              <input type="file" accept="image/*,video/*,.jpg,.jpeg,.png,.webp,.gif,.bmp,.avif,.heic,.heif,.tif,.tiff,.mp4,.webm,.mov,.m4v,.avi,.mkv,.ogv" multiple onChange={handleFiles} className="sr-only" />
-            </label>
+            <div className="dashboard-upload-grid">
+              <label className="dashboard-upload-zone">
+                <ImageIcon size={22} />
+                <span className="font-bold">إضافة صورة الغلاف</span>
+                <span className="text-xs text-[#111111]/50">تفتح نافذة تحديد الجزء الظاهر</span>
+                <input type="file" accept="image/*,.jpg,.jpeg,.png,.webp,.gif,.bmp,.avif,.heic,.heif,.tif,.tiff" onChange={handleCoverFile} className="sr-only" />
+              </label>
+
+              <label className="dashboard-upload-zone">
+                <Upload size={22} />
+                <span className="font-bold">إضافة وسائط</span>
+                <span className="text-xs text-[#111111]/50">صور وفيديوهات متعددة للمعرض</span>
+                <input type="file" accept="image/*,video/*,.jpg,.jpeg,.png,.webp,.gif,.bmp,.avif,.heic,.heif,.tif,.tiff,.mp4,.webm,.mov,.m4v,.avi,.mkv,.ogv" multiple onChange={handleMediaFiles} className="sr-only" />
+              </label>
+            </div>
+
+            {pendingCoverFile && (
+              <div className="dashboard-pending-cover mt-3 flex items-center justify-between gap-3">
+                <span className="truncate text-sm font-bold" dir="ltr">غلاف جاهز: {pendingCoverFile.name}</span>
+                <button type="button" onClick={() => setPendingCoverFile(null)} className="text-brutal-red font-bold text-sm">
+                  إزالة
+                </button>
+              </div>
+            )}
 
             {pendingFiles.length > 0 && (
               <div className="mt-3 space-y-2">
-                <p className="text-xs font-bold text-[#111111]/55">ملفات جاهزة للرفع</p>
+                <p className="text-xs font-bold text-[#111111]/55">وسائط جاهزة للرفع</p>
                 {pendingFiles.map((file, index) => (
                   <div key={`${file.name}-${index}`} className="flex items-center justify-between gap-3 bg-white border-2 border-[#111111]/10 rounded-lg px-3 py-2 text-sm">
                     <span className="truncate" dir="ltr">{file.name}</span>
                     <button type="button" onClick={() => setPendingFiles((items) => items.filter((_, itemIndex) => itemIndex !== index))} className="text-brutal-red font-bold">
-                      حذف
+                      إزالة
                     </button>
                   </div>
                 ))}

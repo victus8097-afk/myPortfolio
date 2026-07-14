@@ -102,11 +102,11 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
 }
 
 function getCoverImage(project: Project): string | null {
-  return (
-    project.project_media
-      ?.filter((media) => media.media_type === 'image' && media.media_url.trim().length > 0)
-      .sort((a, b) => a.sort_order - b.sort_order)[0]?.media_url || null
-  );
+  const cover = project.project_media
+    ?.filter((media) => media.media_type === 'image' && media.media_url.trim().length > 0)
+    .find((media) => media.sort_order === 0);
+
+  return cover?.media_url || null;
 }
 
 function getShortDescription(description: string): string {

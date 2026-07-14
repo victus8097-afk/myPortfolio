@@ -769,6 +769,19 @@ html[dir="rtl"] .featured-projects-cta:hover {
   white-space: nowrap;
 }
 
+.dashboard-upload-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.dashboard-pending-cover {
+  padding: 0.65rem 0.8rem;
+  border: 2px solid var(--color-brutal-black);
+  border-radius: 0.6rem;
+  background: var(--color-warm-light);
+}
+
 .dashboard-upload-zone {
   min-height: 8rem;
   border: 3px dashed rgba(15, 15, 15, 0.45);
@@ -956,6 +969,7 @@ html[dir="rtl"] .featured-projects-cta:hover {
     gap: 0.5rem;
   }
 
+  .dashboard-upload-grid,
   .dashboard-media-grid {
     grid-template-columns: 1fr;
   }
