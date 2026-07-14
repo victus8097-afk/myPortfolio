@@ -30,7 +30,7 @@ export default function Footer() {
 
         <div className="mt-10 pt-5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-medium text-white/35">
           <p>© {currentYear} خالد — جميع الحقوق محفوظة</p>
-          <p>موقع شخصي لعرض الأعمال والخبرات</p>
+          <p className="whitespace-nowrap">أعمال وخبرات خالد</p>
         </div>
       </div>
     </footer>
