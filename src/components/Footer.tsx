@@ -28,9 +28,8 @@ export default function Footer() {
           </p>
         </div>
 
-        <div className="mt-10 pt-5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-medium text-white/35">
-          <p>© {currentYear} خالد — جميع الحقوق محفوظة</p>
-          <p className="whitespace-nowrap">أعمال وخبرات خالد</p>
+        <div className="mt-10 pt-5 border-t border-white/10 flex items-center justify-center text-xs font-medium text-white/35">
+          <p>© {currentYear} — جميع الحقوق محفوظة</p>
         </div>
       </div>
     </footer>
