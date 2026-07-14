@@ -885,6 +885,19 @@ html[dir="rtl"] .featured-projects-cta:hover {
   transform: translateX(-50%);
 }
 
+@media (max-width: 1023px) {
+  .hero-highlight {
+    top: 50%;
+  }
+
+  .hero-copy {
+    width: 100%;
+    max-width: 38rem;
+    justify-self: center;
+    padding: 1.5rem 1rem;
+  }
+}
+
 /* =====================================================   Dashboard polish
    ============================================================ */
 
