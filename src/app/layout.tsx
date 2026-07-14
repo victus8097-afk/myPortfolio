@@ -7,9 +7,12 @@ import './globals.css';
 import ScrollPositionManager from '@/components/ScrollPositionManager';
 
 export const metadata: Metadata = {
-  title: 'Portfolio — موقع شخصي ديناميكي',
-  description: 'موقع إلكتروني شخصي متكامل ومتطور لاستعراض الهوية المهنية والمهارات التقنية ومعرض الأعمال',
-  keywords: ['portfolio', 'موقع شخصي', 'مطور', 'أعمال', 'مهارات'],
+  title: 'بورتفوليو خالد عبدالرحمن',
+  description: 'بورتفوليو خالد عبدالرحمن — استعراض الهوية المهنية والمهارات التقنية ومعرض الأعمال',
+  keywords: ['portfolio', 'بورتفوليو', 'خالد عبدالرحمن', 'مطور', 'أعمال', 'مهارات'],
+  icons: {
+    icon: '/icon.png',
+  },
 };
 
 export default function RootLayout({
