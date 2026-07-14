@@ -58,7 +58,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // منع الدخول لصفحة تسجيل الدخول إذا كان مسجلاً بالفعل
-  if (isLoginPage && user) {
+  const isLoggedOutRequest = request.nextUrl.searchParams.get('logged_out') === '1';
+  if (isLoginPage && user && !isLoggedOutRequest) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = '/sys-gate-hq-99x/dashboard';
     return NextResponse.redirect(redirectUrl);

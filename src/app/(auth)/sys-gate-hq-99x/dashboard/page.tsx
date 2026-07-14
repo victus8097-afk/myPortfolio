@@ -134,15 +134,11 @@ export default function DashboardPage() {
 
   const handleLogout = async () => {
     try {
-      const signOutRequest = supabase.auth.signOut({ scope: 'global' });
-      await Promise.race([
-        signOutRequest,
-        new Promise((resolve) => window.setTimeout(resolve, 3000)),
-      ]);
-    } finally {
-      // local scope يضمن إزالة الجلسة من المتصفح حتى لو تعطل طلب الخادم.
+      // إزالة جلسة المتصفح فوراً ثم تنظيف جلسة الخادم والكوكيز.
       await supabase.auth.signOut({ scope: 'local' }).catch(() => undefined);
-      window.location.replace('/sys-gate-hq-99x');
+      await fetch('/api/auth/logout', { method: 'POST', cache: 'no-store' }).catch(() => undefined);
+    } finally {
+      window.location.replace('/sys-gate-hq-99x?logged_out=1');
     }
   };
 
@@ -709,7 +705,12 @@ function ProjectFormModal({
       onSaved();
       onClose();
     } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : 'تعذر حفظ العمل أو رفع الوسائط');
+      const message = saveError instanceof Error ? saveError.message : 'تعذر حفظ العمل أو رفع الوسائط';
+      setError(
+        /row-level security|permission denied/i.test(message)
+          ? 'صلاحيات التخزين غير مفعلة. شغّل ملف supabase-storage.sql داخل Supabase ثم أعد المحاولة.'
+          : message
+      );
     } finally {
       setSaving(false);
     }
