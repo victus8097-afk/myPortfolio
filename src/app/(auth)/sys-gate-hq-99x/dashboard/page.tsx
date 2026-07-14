@@ -687,18 +687,32 @@ function ProjectFormModal({
         tags: form.tags.split(',').map((tag) => tag.trim()).filter(Boolean),
       };
       let projectId = project?.id;
+      const savePayload = async (payload: typeof data) => {
+        if (projectId) {
+          const { error: updateError } = await supabase.from('projects').update(payload).eq('id', projectId);
+          if (updateError) throw updateError;
+          return;
+        }
 
-      if (projectId) {
-        const { error: updateError } = await supabase.from('projects').update(data).eq('id', projectId);
-        if (updateError) throw updateError;
-      } else {
         const { data: createdProject, error: insertError } = await supabase
           .from('projects')
-          .insert(data)
+          .insert(payload)
           .select('id')
           .single();
         if (insertError) throw insertError;
         projectId = createdProject.id;
+      };
+
+      try {
+        await savePayload(data);
+      } catch (projectError) {
+        // توافق مؤقت مع قواعد البيانات القديمة التي لم يضف لها completed_at بعد.
+        const projectMessage = projectError instanceof Error ? projectError.message : '';
+        if (!data.completed_at || !/completed_at|schema cache|column/i.test(projectMessage)) throw projectError;
+        const legacyData = Object.fromEntries(
+          Object.entries(data).filter(([key]) => key !== 'completed_at')
+        ) as Omit<typeof data, 'completed_at'>;
+        await savePayload(legacyData as typeof data);
       }
 
       if (projectId) await uploadFiles(projectId);
