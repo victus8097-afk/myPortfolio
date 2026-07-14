@@ -745,13 +745,11 @@ html[dir="rtl"] .featured-projects-cta:hover {
 }
 
 .project-detail-meta-aside {
-  position: sticky;
-  top: 5.5rem;
+  position: static;
   width: 100%;
-  max-height: calc(100vh - 7rem);
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
   align-self: start;
-  z-index: 20;
 }
 
 .project-detail-description h2 {
