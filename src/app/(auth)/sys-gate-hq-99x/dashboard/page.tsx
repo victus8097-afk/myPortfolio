@@ -50,6 +50,13 @@ function getUploadMediaType(file: File): UploadMediaType | null {
 
 type ActiveTab = 'overview' | 'projects' | 'skills' | 'settings' | 'security';
 
+type UploadProgress = {
+  current: number;
+  total: number;
+  percent: number;
+  fileName: string;
+};
+
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
   const [isLoading, setIsLoading] = useState(true);
@@ -397,6 +404,7 @@ function ProjectFormModal({
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
   const [error, setError] = useState('');
   const [cropFile, setCropFile] = useState<File | null>(null);
   const [pendingCoverFile, setPendingCoverFile] = useState<File | null>(null);
@@ -428,18 +436,50 @@ function ProjectFormModal({
     setCropFile(null);
   };
 
-  const uploadOneFile = async (projectId: string, file: File, sortOrder: number) => {
+  const uploadObjectWithProgress = async (
+    filePath: string,
+    file: File,
+    onProgress: (percent: number) => void,
+  ) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!session?.access_token || !supabaseUrl || !supabaseKey) {
+      throw new Error('تعذر التحقق من جلسة الدخول أو إعدادات Supabase');
+    }
+
+    await new Promise<void>((resolve, reject) => {
+      const request = new XMLHttpRequest();
+      request.open('POST', `${supabaseUrl}/storage/v1/object/${MEDIA_BUCKET}/${filePath}`);
+      request.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
+      request.setRequestHeader('apikey', supabaseKey);
+      request.setRequestHeader('x-upsert', 'false');
+      request.setRequestHeader('cache-control', '3600');
+      request.setRequestHeader('content-type', file.type || 'application/octet-stream');
+
+      request.upload.onprogress = (event) => {
+        if (event.lengthComputable) onProgress(Math.round((event.loaded / event.total) * 100));
+      };
+      request.onload = () => {
+        if (request.status >= 200 && request.status < 300) resolve();
+        else reject(new Error(request.responseText || 'فشل رفع الملف'));
+      };
+      request.onerror = () => reject(new Error('انقطع الاتصال أثناء رفع الملف'));
+      request.send(file);
+    });
+  };
+
+  const uploadOneFile = async (
+    projectId: string,
+    file: File,
+    sortOrder: number,
+    onProgress: (percent: number) => void,
+  ) => {
     const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
     const filePath = `${projectId}/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
     const mediaType = getUploadMediaType(file) || 'image';
-    const { error: uploadError } = await supabase.storage
-      .from(MEDIA_BUCKET)
-      .upload(filePath, file, {
-        contentType: file.type || (mediaType === 'video' ? 'video/mp4' : 'image/jpeg'),
-        upsert: false,
-      });
-
-    if (uploadError) throw uploadError;
+    await uploadObjectWithProgress(filePath, file, onProgress);
 
     const { data: publicFile } = supabase.storage
       .from(MEDIA_BUCKET)
@@ -458,6 +498,27 @@ function ProjectFormModal({
     if (!pendingCoverFile && pendingFiles.length === 0) return;
 
     setUploading(true);
+    const mediaQueue = [
+      ...pendingFiles.filter((file) => getUploadMediaType(file) === 'image'),
+      ...pendingFiles.filter((file) => getUploadMediaType(file) === 'video'),
+    ];
+    const totalFiles = (pendingCoverFile ? 1 : 0) + mediaQueue.length;
+    let completedFiles = 0;
+
+    const uploadAndTrack = async (file: File, sortOrder: number) => {
+      setUploadProgress({ current: completedFiles, total: totalFiles, percent: 0, fileName: file.name });
+      await uploadOneFile(projectId, file, sortOrder, (percent) => {
+        setUploadProgress({
+          current: completedFiles,
+          total: totalFiles,
+          percent: Math.round(((completedFiles + percent / 100) / totalFiles) * 100),
+          fileName: file.name,
+        });
+      });
+      completedFiles += 1;
+      setUploadProgress({ current: completedFiles, total: totalFiles, percent: Math.round((completedFiles / totalFiles) * 100), fileName: file.name });
+    };
+
     try {
       let mediaStartOrder = mediaItems.length || 1;
 
@@ -468,16 +529,12 @@ function ProjectFormModal({
             supabase.from('project_media').update({ sort_order: index + 1 }).eq('id', item.id)
           )
         );
-        await uploadOneFile(projectId, pendingCoverFile, 0);
+        await uploadAndTrack(pendingCoverFile, 0);
         mediaStartOrder = mediaItems.length + 1;
       }
 
-      const mediaQueue = [
-        ...pendingFiles.filter((file) => getUploadMediaType(file) === 'image'),
-        ...pendingFiles.filter((file) => getUploadMediaType(file) === 'video'),
-      ];
       for (const [index, file] of mediaQueue.entries()) {
-        await uploadOneFile(projectId, file, mediaStartOrder + index);
+        await uploadAndTrack(file, mediaStartOrder + index);
       }
     } finally {
       setUploading(false);
@@ -746,6 +803,19 @@ function ProjectFormModal({
 
             {!project && <p className="text-xs text-[#111111]/45 mt-3">سيتم رفع الملفات بعد حفظ العمل لأول مرة.</p>}
           </div>
+
+          {uploading && uploadProgress && (
+            <div className="dashboard-upload-progress" role="status" aria-live="polite">
+              <div className="flex items-center justify-between gap-3 mb-2 text-xs font-bold">
+                <span className="truncate" dir="ltr">جاري رفع: {uploadProgress.fileName}</span>
+                <span>{uploadProgress.percent}%</span>
+              </div>
+              <div className="dashboard-progress-track">
+                <div className="dashboard-progress-bar" style={{ width: `${uploadProgress.percent}%` }}></div>
+              </div>
+              <p className="text-[11px] text-[#111111]/45 mt-2">ملف {Math.min(uploadProgress.current + 1, uploadProgress.total)} من {uploadProgress.total}</p>
+            </div>
+          )}
 
           {error && <p className="dashboard-form-error">{error}</p>}
 

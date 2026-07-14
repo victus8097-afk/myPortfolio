@@ -842,6 +842,28 @@ html[dir="rtl"] .featured-projects-cta:hover {
   font-weight: 800;
 }
 
+.dashboard-upload-progress {
+  padding: 0.85rem;
+  border: 2px solid var(--color-brutal-black);
+  border-radius: 0.7rem;
+  background: var(--color-sky-light);
+}
+
+.dashboard-progress-track {
+  height: 0.7rem;
+  overflow: hidden;
+  border: 2px solid var(--color-brutal-black);
+  border-radius: 999px;
+  background: white;
+}
+
+.dashboard-progress-bar {
+  height: 100%;
+  min-width: 0.5rem;
+  background: var(--color-brutal-black);
+  transition: width 0.2s ease;
+}
+
 .dashboard-form-error {
   padding: 0.75rem;
   border: 2px solid var(--color-brutal-red);
