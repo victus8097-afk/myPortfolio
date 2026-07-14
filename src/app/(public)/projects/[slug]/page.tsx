@@ -18,12 +18,6 @@ interface ProjectDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
-const typeLabels: Record<string, string> = {
-  mobile_app: 'تطبيق جوال',
-  web_app: 'موقع ويب',
-  other: 'عمل آخر',
-};
-
 export async function generateMetadata({ params }: ProjectDetailPageProps) {
   const { slug } = await params;
   const project = await getProjectBySlug(slug);
@@ -71,7 +65,6 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
   }
 
   const typeClass = getProjectTypeClass(project.project_type);
-  const typeLabel = typeLabels[project.project_type] || project.project_type;
 
   return (
     <main className="project-detail-page min-h-screen bg-brutal-gray">
@@ -81,7 +74,6 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         <div className="max-w-6xl mx-auto">
           <div className="project-detail-toolbar flex flex-wrap items-center justify-between gap-4 mb-8">
             <BackToPrevious />
-            <span className={`project-detail-type ${typeClass}`}>{typeLabel}</span>
           </div>
 
           <header className={`project-detail-header ${typeClass} mb-10`}>

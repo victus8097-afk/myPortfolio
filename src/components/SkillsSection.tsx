@@ -60,7 +60,7 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
           const banner = categoryBanners[groupIdx % categoryBanners.length];
 
           return (
-            <div key={category} className="mb-6 last:mb-0">
+            <div key={category} className="mb-10 last:mb-0">
               <h3 className="skills-category-title text-xl sm:text-2xl font-black text-brutal-black mb-5 text-center">
                 {category}
               </h3>

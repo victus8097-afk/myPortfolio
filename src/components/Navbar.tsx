@@ -82,7 +82,7 @@ export default function Navbar() {
               alt="بورتفوليو"
               className="w-9 h-9 rounded-lg object-contain"
             />
-            <div className="hidden sm:flex flex-col leading-none mr-1">
+            <div className="flex flex-col leading-none mr-1">
               <span className="text-sm font-extrabold text-brutal-black">خالد</span>
               <span className="h-[1.5px] bg-gradient-to-l from-brutal-black/50 to-transparent rounded-full mt-1.5"></span>
               <span className="text-[10px] font-bold text-brutal-black/50 mt-1.5">مطور ويب وتطبيقات</span>
