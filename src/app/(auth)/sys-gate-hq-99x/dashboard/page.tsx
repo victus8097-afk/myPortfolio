@@ -32,6 +32,22 @@ import {
 
 const MEDIA_BUCKET = 'project-media';
 
+const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'avif', 'heic', 'heif', 'tif', 'tiff'];
+const VIDEO_EXTENSIONS = ['mp4', 'webm', 'mov', 'm4v', 'avi', 'mkv', 'ogv'];
+
+type UploadMediaType = 'image' | 'video';
+
+function getFileExtension(file: File): string {
+  return file.name.split('.').pop()?.toLowerCase() || '';
+}
+
+function getUploadMediaType(file: File): UploadMediaType | null {
+  const extension = getFileExtension(file);
+  if (file.type.startsWith('image/') || IMAGE_EXTENSIONS.includes(extension)) return 'image';
+  if (file.type.startsWith('video/') || VIDEO_EXTENSIONS.includes(extension)) return 'video';
+  return null;
+}
+
 type ActiveTab = 'overview' | 'projects' | 'skills' | 'settings' | 'security';
 
 export default function DashboardPage() {
@@ -393,11 +409,9 @@ function ProjectFormModal({
   };
 
   const handleFiles = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []).filter(
-      (file) => file.type.startsWith('image/') || file.type.startsWith('video/')
-    );
-    const images = files.filter((file) => file.type.startsWith('image/'));
-    const videos = files.filter((file) => file.type.startsWith('video/'));
+    const files = Array.from(event.target.files || []).filter((file) => getUploadMediaType(file));
+    const images = files.filter((file) => getUploadMediaType(file) === 'image');
+    const videos = files.filter((file) => getUploadMediaType(file) === 'video');
 
     setPendingFiles((current) => [...current, ...videos]);
     if (images.length > 0) {
@@ -432,16 +446,20 @@ function ProjectFormModal({
 
     setUploading(true);
     const uploadQueue = [
-      ...pendingFiles.filter((file) => file.type.startsWith('image/')),
-      ...pendingFiles.filter((file) => file.type.startsWith('video/')),
+      ...pendingFiles.filter((file) => getUploadMediaType(file) === 'image'),
+      ...pendingFiles.filter((file) => getUploadMediaType(file) === 'video'),
     ];
     try {
       for (const [index, file] of uploadQueue.entries()) {
         const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
         const filePath = `${projectId}/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
+        const mediaType = getUploadMediaType(file);
         const { error: uploadError } = await supabase.storage
           .from(MEDIA_BUCKET)
-          .upload(filePath, file, { contentType: file.type, upsert: false });
+          .upload(filePath, file, {
+            contentType: file.type || (mediaType === 'video' ? 'video/mp4' : 'image/jpeg'),
+            upsert: false,
+          });
 
         if (uploadError) throw uploadError;
 
@@ -451,7 +469,7 @@ function ProjectFormModal({
         const { error: mediaError } = await supabase.from('project_media').insert({
           project_id: projectId,
           media_url: publicFile.publicUrl,
-          media_type: file.type.startsWith('video/') ? 'video' : 'image',
+          media_type: mediaType || 'image',
           sort_order: mediaItems.length + index,
         });
 
@@ -653,7 +671,7 @@ function ProjectFormModal({
               <Upload size={22} />
               <span className="font-bold">اختر صوراً أو فيديوهات</span>
               <span className="text-xs text-[#111111]/50">يمكنك اختيار أكثر من ملف في نفس الوقت</span>
-              <input type="file" accept="image/*,video/*" multiple onChange={handleFiles} className="sr-only" />
+              <input type="file" accept="image/*,video/*,.jpg,.jpeg,.png,.webp,.gif,.bmp,.avif,.heic,.heif,.tif,.tiff,.mp4,.webm,.mov,.m4v,.avi,.mkv,.ogv" multiple onChange={handleFiles} className="sr-only" />
             </label>
 
             {pendingFiles.length > 0 && (

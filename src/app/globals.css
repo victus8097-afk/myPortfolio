@@ -853,6 +853,7 @@ html[dir="rtl"] .featured-projects-cta:hover {
   position: relative;
   width: 100%;
   max-height: 58vh;
+  min-height: 14rem;
   margin-inline: auto;
   overflow: hidden;
   background: var(--color-brutal-gray);
@@ -866,6 +867,29 @@ html[dir="rtl"] .featured-projects-cta:hover {
   object-fit: fill;
   user-select: none;
   pointer-events: none;
+}
+
+.dashboard-crop-loading,
+.dashboard-crop-error {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.dashboard-crop-loading {
+  color: rgba(15, 15, 15, 0.45);
+}
+
+.dashboard-crop-error {
+  color: var(--color-brutal-red);
+  background: rgba(255, 255, 255, 0.88);
 }
 
 .dashboard-crop-box {

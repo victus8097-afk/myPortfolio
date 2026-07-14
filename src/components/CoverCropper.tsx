@@ -29,9 +29,12 @@ export default function CoverCropper({ file, onCancel, onConfirm }: CoverCropper
   const stageRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ startX: number; startY: number; crop: CropBox } | null>(null);
   const sourceUrl = useMemo(() => URL.createObjectURL(file), [file]);
+  const [fallbackUrl, setFallbackUrl] = useState('');
   const [imageSize, setImageSize] = useState<ImageSize | null>(null);
   const [cropBox, setCropBox] = useState<CropBox | null>(null);
+  const [previewError, setPreviewError] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const previewUrl = fallbackUrl || sourceUrl;
 
   useEffect(() => () => URL.revokeObjectURL(sourceUrl), [sourceUrl]);
 
@@ -85,6 +88,20 @@ export default function CoverCropper({ file, onCancel, onConfirm }: CoverCropper
     }
   };
 
+  const handlePreviewError = () => {
+    if (fallbackUrl) {
+      setPreviewError('تعذر عرض هذا النوع من الصور في المتصفح. جرّب JPG أو PNG أو WebP.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') setFallbackUrl(reader.result);
+    };
+    reader.onerror = () => setPreviewError('تعذر قراءة الملف. جرّب اختيار الصورة مرة أخرى.');
+    reader.readAsDataURL(file);
+  };
+
   const confirmCrop = () => {
     if (!cropBox || !imageSize || !stageRef.current) return;
 
@@ -130,7 +147,7 @@ export default function CoverCropper({ file, onCancel, onConfirm }: CoverCropper
       }, 'image/jpeg', 0.92);
     };
     image.onerror = () => setIsProcessing(false);
-    image.src = sourceUrl;
+    image.src = previewUrl;
   };
 
   return (
@@ -148,12 +165,21 @@ export default function CoverCropper({ file, onCancel, onConfirm }: CoverCropper
         </div>
 
         <div ref={stageRef} className="dashboard-crop-stage" style={{ aspectRatio: imageSize ? `${imageSize.width} / ${imageSize.height}` : '16 / 9' }}>
+          {!imageSize && !previewError && <span className="dashboard-crop-loading">جاري تحميل الصورة...</span>}
+          {previewError && <span className="dashboard-crop-error">{previewError}</span>}
           <img
-            src={sourceUrl}
+            key={previewUrl}
+            src={previewUrl}
             alt="معاينة الصورة قبل اعتماد الغلاف"
-            onLoad={(event) => setImageSize({ width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight })}
+            className={previewError ? 'hidden' : ''}
+            onLoad={(event) => {
+              setPreviewError('');
+              setCropBox(null);
+              setImageSize({ width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight });
+            }}
+            onError={handlePreviewError}
           />
-          {cropBox && (
+          {cropBox && !previewError && (
             <div
               className="dashboard-crop-box"
               style={{ left: cropBox.x, top: cropBox.y, width: cropBox.width, height: cropBox.height }}
@@ -172,7 +198,7 @@ export default function CoverCropper({ file, onCancel, onConfirm }: CoverCropper
           <button type="button" onClick={onCancel} className="brutal-btn bg-white text-sm">
             إلغاء
           </button>
-          <button type="button" onClick={confirmCrop} disabled={!cropBox || isProcessing} className="brutal-btn brutal-btn-mint text-sm">
+          <button type="button" onClick={confirmCrop} disabled={!cropBox || !!previewError || isProcessing} className="brutal-btn brutal-btn-mint text-sm">
             <Check size={16} />
             {isProcessing ? 'جاري تجهيز الغلاف...' : 'اعتماد الغلاف'}
           </button>
