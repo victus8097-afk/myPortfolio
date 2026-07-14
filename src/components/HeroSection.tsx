@@ -32,7 +32,7 @@ export default function HeroSection({ profile }: HeroSectionProps) {
           </div>
 
           {/* الكلام */}
-          <div className="hero-copy order-2 lg:order-2 text-center">
+          <div className="hero-copy order-2 text-center">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-brutal-black leading-[1.1] mb-10">
               أنا{' '}
               <span className="relative inline-block">
