@@ -20,19 +20,19 @@ export default function HeroSection({ profile }: HeroSectionProps) {
 
       {/* المستطيل المائل الجريء */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[360px] bg-mint/15 rotate-3 border-y-3 border-brutal-black/8"></div>
+        <div className="hero-highlight absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[360px] bg-mint/15 rotate-3 border-y-3 border-brutal-black/8"></div>
       </div>
 
       {/* المحتوى */}
       <div className="max-w-7xl mx-auto w-full px-6 sm:px-8 lg:px-12 relative z-10 min-h-screen flex items-center">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center w-full py-20 lg:py-0">
           {/* الشخصية */}
-          <div className="order-1 lg:order-1 flex justify-center pt-8 lg:pt-0">
+          <div className="hidden lg:flex order-1 lg:order-1 justify-center pt-8 lg:pt-0">
             <CharacterWithEyes />
           </div>
 
           {/* الكلام */}
-          <div className="order-2 lg:order-2 text-center">
+          <div className="hero-copy order-2 lg:order-2 text-center">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-brutal-black leading-[1.1] mb-10">
               أنا{' '}
               <span className="relative inline-block">
