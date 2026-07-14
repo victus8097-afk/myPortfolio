@@ -1136,7 +1136,7 @@ html[dir="rtl"] .featured-projects-cta:hover {
   pointer-events: none;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 767px) {
   .project-detail-meta-aside {
     position: static;
   }
