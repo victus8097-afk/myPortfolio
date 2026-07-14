@@ -745,10 +745,14 @@ html[dir="rtl"] .featured-projects-cta:hover {
 }
 
 .project-detail-meta-aside {
-  position: sticky;
+  position: fixed;
   top: 5.5rem;
+  left: max(1.5rem, calc((100vw - 72rem) / 2));
+  width: 22rem;
+  max-height: calc(100vh - 7rem);
+  overflow-y: auto;
   align-self: start;
-  z-index: 20;
+  z-index: 40;
 }
 
 .project-detail-description h2 {
@@ -1139,6 +1143,10 @@ html[dir="rtl"] .featured-projects-cta:hover {
 @media (max-width: 767px) {
   .project-detail-meta-aside {
     position: static;
+    left: auto;
+    width: auto;
+    max-height: none;
+    overflow: visible;
   }
 }
 
