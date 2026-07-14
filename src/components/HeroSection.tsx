@@ -18,13 +18,13 @@ export default function HeroSection({ profile }: HeroSectionProps) {
       <div className="absolute inset-0 bg-white/70 backdrop-blur-sm"></div>
       <div className="absolute inset-0 stripe-pattern pointer-events-none"></div>
 
-      {/* المستطيل المائل الجريء */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {/* المستطيل الأخضر الجريء */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
         <div className="hero-highlight absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[360px] bg-mint/15 rotate-3 border-y-3 border-brutal-black/8"></div>
       </div>
 
       {/* المحتوى */}
-      <div className="max-w-7xl mx-auto w-full px-6 sm:px-8 lg:px-12 relative z-10 flex items-center">
+      <div className="max-w-7xl mx-auto w-full px-6 sm:px-8 lg:px-12 relative z-10 min-h-screen flex items-center">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center w-full py-20 lg:py-0">
           {/* الشخصية — تظهر على الشاشات الكبيرة فقط */}
           <div className="hidden lg:flex order-1 justify-center pt-8">
@@ -33,7 +33,7 @@ export default function HeroSection({ profile }: HeroSectionProps) {
 
           {/* الكلام */}
           <div className="hero-copy order-2 text-center">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-brutal-black leading-[1.1] mb-10">
+            <h1 className="text-4xl sm:text-4xl lg:text-5xl font-extrabold text-brutal-black leading-[1.1] mb-10">
               أنا{' '}
               <span className="relative inline-block">
                 {profile.full_name}
@@ -47,7 +47,7 @@ export default function HeroSection({ profile }: HeroSectionProps) {
               {profile.job_title}
             </h2>
 
-            <p className="text-xs sm:text-sm text-brutal-black/70 leading-relaxed mb-8 max-w-lg mx-auto font-extrabold">
+            <p className="text-xs sm:text-sm text-brutal-black/70 leading-relaxed mb-8 max-w-lg mx-auto">
               {profile.bio_summary}
             </p>
 
