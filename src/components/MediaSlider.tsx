@@ -19,6 +19,8 @@ export default function MediaSlider({ media }: MediaSliderProps) {
   const [mediaError, setMediaError] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxZoom, setLightboxZoom] = useState(1);
+  const [lightboxPan, setLightboxPan] = useState({ x: 0, y: 0 });
+  const lightboxDragRef = useRef<{ startX: number; startY: number; panX: number; panY: number } | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -33,18 +35,52 @@ export default function MediaSlider({ media }: MediaSliderProps) {
 
   const openLightbox = () => {
     setLightboxZoom(1);
+    setLightboxPan({ x: 0, y: 0 });
     setLightboxOpen(true);
   };
 
   const closeLightbox = () => {
     setLightboxZoom(1);
+    setLightboxPan({ x: 0, y: 0 });
     setLightboxOpen(false);
   };
 
   const handleLightboxWheel = (event: React.WheelEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.stopPropagation();
-    setLightboxZoom((current) => Math.min(4, Math.max(1, current + (event.deltaY < 0 ? 0.2 : -0.2))));
+    setLightboxZoom((current) => {
+      const nextZoom = Math.min(4, Math.max(1, current + (event.deltaY < 0 ? 0.2 : -0.2)));
+      if (nextZoom === 1) setLightboxPan({ x: 0, y: 0 });
+      return nextZoom;
+    });
+  };
+
+  const handleLightboxPointerDown = (event: React.PointerEvent<HTMLImageElement>) => {
+    if (lightboxZoom <= 1) return;
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    lightboxDragRef.current = {
+      startX: event.clientX,
+      startY: event.clientY,
+      panX: lightboxPan.x,
+      panY: lightboxPan.y,
+    };
+  };
+
+  const handleLightboxPointerMove = (event: React.PointerEvent<HTMLImageElement>) => {
+    if (!lightboxDragRef.current) return;
+    const drag = lightboxDragRef.current;
+    setLightboxPan({
+      x: drag.panX + event.clientX - drag.startX,
+      y: drag.panY + event.clientY - drag.startY,
+    });
+  };
+
+  const stopLightboxDragging = (event: React.PointerEvent<HTMLImageElement>) => {
+    if (lightboxDragRef.current) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+      lightboxDragRef.current = null;
+    }
   };
 
   const orderedMedia = [...media].sort((a, b) => {
@@ -168,20 +204,25 @@ onClick={openLightbox}
           onClick={closeLightbox}
           onWheel={handleLightboxWheel}
         >
-          <div className="media-lightbox-toolbar">
-            مرّر عجلة الماوس للتكبير — {Math.round(lightboxZoom * 100)}%
+          <div className="media-lightbox-content" onClick={(event) => event.stopPropagation()}>
+            <img
+              src={currentMedia.media_url}
+              alt={`صورة العمل ${currentIndex + 1} بالحجم الكامل`}
+              className="media-lightbox-image object-contain border-4 border-white shadow-[8px_8px_0px_#0F0F0F]"
+              style={{ transform: `translate(${lightboxPan.x}px, ${lightboxPan.y}px) scale(${lightboxZoom})` }}
+              onPointerDown={handleLightboxPointerDown}
+              onPointerMove={handleLightboxPointerMove}
+              onPointerUp={stopLightboxDragging}
+              onPointerCancel={stopLightboxDragging}
+              onWheel={handleLightboxWheel}
+            />
+            <div className="media-lightbox-toolbar">
+              مرّر عجلة الماوس للتكبير، واسحب الصورة بعد التكبير — {Math.round(lightboxZoom * 100)}%
+            </div>
           </div>
           <button type="button" onClick={closeLightbox} className="absolute top-5 right-5 media-lightbox-close" aria-label="إغلاق الصورة">
             <X size={22} />
           </button>
-          <img
-            src={currentMedia.media_url}
-            alt={`صورة العمل ${currentIndex + 1} بالحجم الكامل`}
-            className="media-lightbox-image object-contain border-4 border-white shadow-[8px_8px_0px_#0F0F0F]"
-            style={{ transform: `scale(${lightboxZoom})` }}
-            onClick={(event) => event.stopPropagation()}
-            onWheel={handleLightboxWheel}
-          />
         </div>
       )}
     </div>

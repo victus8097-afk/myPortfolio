@@ -638,12 +638,18 @@ html[dir="rtl"] .featured-projects-cta:hover {
   overscroll-behavior: contain;
 }
 
+.media-lightbox-content {
+  max-width: 92vw;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+}
+
 .media-lightbox-toolbar {
-  position: absolute;
-  top: 1.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
+  position: static;
   padding: 0.4rem 0.7rem;
   border: 2px solid white;
   border-radius: 0.5rem;
@@ -651,13 +657,21 @@ html[dir="rtl"] .featured-projects-cta:hover {
   color: white;
   font-size: 0.75rem;
   font-weight: 800;
+  text-align: center;
 }
 
 .media-lightbox-image {
   max-width: 90vw;
-  max-height: 90vh;
+  max-height: 78vh;
   transform-origin: center;
   transition: transform 0.12s ease-out;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.media-lightbox-image:active {
+  cursor: grabbing;
 }
 
 .media-lightbox-close {
