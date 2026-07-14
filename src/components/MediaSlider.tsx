@@ -1,14 +1,13 @@
 'use client';
 
 // ============================================================
-// MediaSlider.tsx — معرض الوسائط التفاعلي (Carousel)
-// Client Component: Lazy Loading / Dynamic Import فقط
-// أزرار تشبه أزرار مسجلات الكاسيت القديمة
+// MediaSlider.tsx — معرض الصور والفيديوهات
+// Client Component: عرض الوسائط بترتيب الفيديوهات أولاً
 // ============================================================
 
 import { useState, useRef } from 'react';
 import type { ProjectMedia } from '@/types';
-import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, Pause, X, Maximize2 } from 'lucide-react';
 
 interface MediaSliderProps {
   media: ProjectMedia[];
@@ -16,10 +15,18 @@ interface MediaSliderProps {
 
 export default function MediaSlider({ media }: MediaSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [loadedMediaId, setLoadedMediaId] = useState<number | null>(null);
+  const [mediaError, setMediaError] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  if (!media || media.length === 0) {
+  const orderedMedia = [...media].sort((a, b) => {
+    if (a.media_type !== b.media_type) return a.media_type === 'video' ? -1 : 1;
+    return a.sort_order - b.sort_order;
+  });
+
+  if (orderedMedia.length === 0) {
     return (
       <div className="project-media-empty brutal-card h-64 flex items-center justify-center bg-brutal-gray">
         <p className="text-sm font-bold text-[#111111]/45">لا توجد وسائط مضافة لهذا العمل</p>
@@ -27,113 +34,121 @@ export default function MediaSlider({ media }: MediaSliderProps) {
     );
   }
 
-  const goToPrev = () => {
-    setCurrentIndex((prev) => (prev === 0 ? media.length - 1 : prev - 1));
+  const currentMedia = orderedMedia[currentIndex];
+  const isLoading = loadedMediaId !== currentMedia.id && !mediaError;
+
+  const selectMedia = (index: number) => {
+    setCurrentIndex(index);
     setIsPlaying(false);
+    setMediaError(false);
+    setLightboxOpen(false);
+  };
+
+  const goToPrev = () => {
+    selectMedia(currentIndex === 0 ? orderedMedia.length - 1 : currentIndex - 1);
   };
 
   const goToNext = () => {
-    setCurrentIndex((prev) => (prev === media.length - 1 ? 0 : prev + 1));
-    setIsPlaying(false);
+    selectMedia(currentIndex === orderedMedia.length - 1 ? 0 : currentIndex + 1);
   };
 
   const toggleVideoPlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
+    if (!videoRef.current) return;
+    if (isPlaying) videoRef.current.pause();
+    else videoRef.current.play();
+    setIsPlaying(!isPlaying);
   };
-
-  const currentMedia = media[currentIndex];
 
   return (
     <div className="project-media-viewer relative">
-      {/* إطار عرض الوسائط */}
       <div className="project-media-frame brutal-card overflow-hidden bg-black border-4 border-[#111111] shadow-[6px_6px_0px_#111111] rounded-xl">
-        {/* شريط العنوان */}
-        <div className="project-media-header bg-[#111111] px-4 py-2 flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-brutal-red border border-[#111111]"></div>
-          <div className="w-3 h-3 rounded-full bg-warm border border-[#111111]"></div>
-          <div className="w-3 h-3 rounded-full bg-mint border border-[#111111]"></div>
-          <span className="text-white text-xs font-mono ml-4">
-            عرض الوسائط — {currentIndex + 1} / {media.length}
+        <div className="project-media-header bg-[#111111] px-4 py-2 flex items-center justify-between gap-3">
+          <span className="text-white text-xs font-bold">
+            {currentMedia.media_type === 'video' ? 'فيديو' : 'صورة'} — {currentIndex + 1} / {orderedMedia.length}
           </span>
+          {currentMedia.media_type === 'image' && !isLoading && !mediaError && (
+            <button type="button" onClick={() => setLightboxOpen(true)} className="text-white/70 hover:text-white" aria-label="تكبير الصورة">
+              <Maximize2 size={16} />
+            </button>
+          )}
         </div>
 
-        {/* المحتوى */}
-        <div className="relative aspect-video bg-brutal-gray flex items-center justify-center">
+        <div className="project-media-content relative aspect-video bg-brutal-gray flex items-center justify-center">
           {currentMedia.media_type === 'image' ? (
-            <img
-              src={currentMedia.media_url}
-              alt={`وسائط العمل ${currentIndex + 1}`}
-              className="w-full h-full object-contain"
-            />
+            <button
+              type="button"
+              className="w-full h-full cursor-zoom-in disabled:cursor-default"
+              onClick={() => setLightboxOpen(true)}
+              disabled={isLoading || mediaError}
+            >
+              <img
+                src={currentMedia.media_url}
+                alt={`صورة العمل ${currentIndex + 1}`}
+                className="w-full h-full object-contain"
+                onLoad={() => setLoadedMediaId(currentMedia.id)}
+                onError={() => setMediaError(true)}
+              />
+            </button>
           ) : (
             <div className="relative w-full h-full">
               <video
                 ref={videoRef}
                 src={currentMedia.media_url}
                 className="w-full h-full object-contain"
+                onLoadedData={() => setLoadedMediaId(currentMedia.id)}
+                onError={() => setMediaError(true)}
                 onEnded={() => setIsPlaying(false)}
               />
-              <button
-                onClick={toggleVideoPlay}
-                className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors"
-              >
-                <div className="w-16 h-16 rounded-full bg-white/90 border-3 border-[#111111] shadow-[3px_3px_0px_#111111] flex items-center justify-center">
-                  {isPlaying ? (
-                    <Pause size={24} className="text-[#111111]" />
-                  ) : (
-                    <Play size={24} className="text-[#111111] ml-1" />
-                  )}
-                </div>
+              <button onClick={toggleVideoPlay} className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors" aria-label={isPlaying ? 'إيقاف الفيديو' : 'تشغيل الفيديو'}>
+                <span className="w-16 h-16 rounded-full bg-white/90 border-3 border-[#111111] shadow-[3px_3px_0px_#111111] flex items-center justify-center">
+                  {isPlaying ? <Pause size={24} className="text-[#111111]" /> : <Play size={24} className="text-[#111111] ml-1" />}
+                </span>
               </button>
             </div>
           )}
+
+          {isLoading && (
+            <div className="project-media-loading absolute inset-0 flex flex-col items-center justify-center gap-3">
+              <span className="project-media-spinner" aria-hidden="true"></span>
+              <p>جاري تحميل الوسيطة...</p>
+            </div>
+          )}
+          {mediaError && <p className="absolute inset-0 flex items-center justify-center font-bold text-brutal-red bg-white/80">تعذر تحميل الوسيطة</p>}
         </div>
       </div>
 
-      {/* أزرار التحكم بأسلوب الكاسيت */}
       <div className="flex items-center justify-center gap-4 mt-4">
-        <button
-          onClick={goToPrev}
-          className="brutal-btn brutal-btn-dark w-12 h-12 p-0 rounded-full"
-          aria-label="السابق"
-        >
+        <button onClick={goToPrev} className="media-slider-control" aria-label="الوسائط السابقة">
           <ChevronRight size={20} />
         </button>
-
-        {/* نقاط التقدم */}
         <div className="flex gap-2">
-          {media.map((_, index) => (
+          {orderedMedia.map((item, index) => (
             <button
-              key={index}
-              onClick={() => {
-                setCurrentIndex(index);
-                setIsPlaying(false);
-              }}
-              className={`w-3 h-3 rounded-full border-2 border-[#111111] transition-all ${
-                index === currentIndex
-                  ? 'bg-mint scale-125'
-                  : 'bg-white hover:bg-gray-200'
-              }`}
-              aria-label={`الانتقال للوسائط ${index + 1}`}
+              key={item.id}
+              onClick={() => selectMedia(index)}
+              className={`media-slider-dot ${index === currentIndex ? 'is-active' : ''}`}
+              aria-label={`عرض الوسيطة ${index + 1}`}
             />
           ))}
         </div>
-
-        <button
-          onClick={goToNext}
-          className="brutal-btn brutal-btn-dark w-12 h-12 p-0 rounded-full"
-          aria-label="التالي"
-        >
+        <button onClick={goToNext} className="media-slider-control" aria-label="الوسائط التالية">
           <ChevronLeft size={20} />
         </button>
       </div>
+
+      {lightboxOpen && currentMedia.media_type === 'image' && !mediaError && (
+        <div className="project-media-lightbox fixed inset-0 z-[80] flex items-center justify-center p-4" onClick={() => setLightboxOpen(false)}>
+          <button type="button" onClick={() => setLightboxOpen(false)} className="absolute top-5 right-5 media-lightbox-close" aria-label="إغلاق الصورة">
+            <X size={22} />
+          </button>
+          <img
+            src={currentMedia.media_url}
+            alt={`صورة العمل ${currentIndex + 1} بالحجم الكامل`}
+            className="max-w-full max-h-[90vh] object-contain border-4 border-white shadow-[8px_8px_0px_#0F0F0F]"
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }

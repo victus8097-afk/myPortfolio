@@ -95,6 +95,7 @@ export interface Database {
           is_visible: boolean;
           is_featured: boolean;
           created_at: string;
+          completed_at: string | null;
         };
         Insert: {
           id?: string;
@@ -107,6 +108,7 @@ export interface Database {
           is_visible?: boolean;
           is_featured?: boolean;
           created_at?: string;
+          completed_at?: string | null;
         };
         Update: {
           id?: string;
@@ -119,6 +121,7 @@ export interface Database {
           is_visible?: boolean;
           is_featured?: boolean;
           created_at?: string;
+          completed_at?: string | null;
         };
       };
       project_media: {

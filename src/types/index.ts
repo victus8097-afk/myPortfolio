@@ -41,6 +41,7 @@ export interface Project {
   is_visible: boolean;
   is_featured: boolean;
   created_at: string;
+  completed_at: string | null;
   // Joined relation (optional)
   project_media?: ProjectMedia[];
 }

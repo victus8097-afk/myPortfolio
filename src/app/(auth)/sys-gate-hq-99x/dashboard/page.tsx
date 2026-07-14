@@ -399,6 +399,7 @@ function ProjectFormModal({
     store_url: project?.store_url || '',
     is_visible: project?.is_visible ?? true,
     is_featured: project?.is_featured ?? false,
+    completed_at: project?.completed_at || '',
   });
   const [mediaItems, setMediaItems] = useState<ProjectMedia[]>(project?.project_media || []);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
@@ -695,6 +696,17 @@ function ProjectFormModal({
                 dir="ltr"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold mb-1">تاريخ انتهاء العمل</label>
+            <input
+              type="date"
+              value={form.completed_at}
+              onChange={(event) => setForm({ ...form, completed_at: event.target.value })}
+              className="brutal-input"
+              dir="ltr"
+            />
           </div>
 
           <div className="flex flex-wrap gap-4">

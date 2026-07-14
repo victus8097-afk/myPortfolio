@@ -41,7 +41,8 @@ CREATE TABLE projects (
   store_url TEXT,
   is_visible BOOLEAN DEFAULT TRUE NOT NULL,
   is_featured BOOLEAN DEFAULT FALSE NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  completed_at DATE
 );
 
 -- 5. Create Project Media Table (For Grid Carousel & Videos)
