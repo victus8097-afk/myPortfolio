@@ -49,6 +49,10 @@ export default function Navbar() {
 
   const goToSection = (href: string) => {
     setMobileOpen(false);
+    if (href === '#hero') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
   };
 

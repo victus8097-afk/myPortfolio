@@ -10,12 +10,23 @@ export default function ScrollPositionManager() {
 
   useEffect(() => {
     const storageKey = `${STORAGE_PREFIX}${pathname}`;
-    const savedPosition = sessionStorage.getItem(storageKey);
+    const hash = window.location.hash;
 
-    if (savedPosition) {
-      const position = Number(savedPosition);
-      if (Number.isFinite(position)) {
-        requestAnimationFrame(() => window.scrollTo(0, position));
+    if (hash) {
+      requestAnimationFrame(() => {
+        if (hash === '#hero') {
+          window.scrollTo(0, 0);
+        } else {
+          document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: 'auto' });
+        }
+      });
+    } else {
+      const savedPosition = sessionStorage.getItem(storageKey);
+      if (savedPosition) {
+        const position = Number(savedPosition);
+        if (Number.isFinite(position)) {
+          requestAnimationFrame(() => window.scrollTo(0, position));
+        }
       }
     }
 
