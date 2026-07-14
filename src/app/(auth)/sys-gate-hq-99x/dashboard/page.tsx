@@ -8,6 +8,7 @@
 import { useState, useEffect, useCallback, useMemo, type ChangeEvent } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import CoverCropper from '@/components/CoverCropper';
 import type { Project, ProjectMedia, Skill, ContactChannel, ProfileSettings, DashboardStats } from '@/types';
 import {
   LayoutDashboard,
@@ -381,21 +382,61 @@ function ProjectFormModal({
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [cropFile, setCropFile] = useState<File | null>(null);
+  const [cropQueue, setCropQueue] = useState<File[]>([]);
+
+  const startCropQueue = (files: File[]) => {
+    const [nextFile, ...remaining] = files;
+    if (!nextFile) return;
+    setCropFile(nextFile);
+    setCropQueue(remaining);
+  };
 
   const handleFiles = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []).filter(
       (file) => file.type.startsWith('image/') || file.type.startsWith('video/')
     );
-    setPendingFiles((current) => [...current, ...files]);
+    const images = files.filter((file) => file.type.startsWith('image/'));
+    const videos = files.filter((file) => file.type.startsWith('video/'));
+
+    setPendingFiles((current) => [...current, ...videos]);
+    if (images.length > 0) {
+      if (cropFile) {
+        setCropQueue((current) => [...current, ...images]);
+      } else {
+        startCropQueue(images);
+      }
+    }
     event.target.value = '';
+  };
+
+  const handleCropConfirmed = (croppedFile: File) => {
+    setPendingFiles((current) => [...current, croppedFile]);
+    if (cropQueue.length > 0) {
+      startCropQueue(cropQueue);
+    } else {
+      setCropFile(null);
+    }
+  };
+
+  const handleCropCancelled = () => {
+    if (cropQueue.length > 0) {
+      startCropQueue(cropQueue);
+    } else {
+      setCropFile(null);
+    }
   };
 
   const uploadFiles = async (projectId: string) => {
     if (pendingFiles.length === 0) return;
 
     setUploading(true);
+    const uploadQueue = [
+      ...pendingFiles.filter((file) => file.type.startsWith('image/')),
+      ...pendingFiles.filter((file) => file.type.startsWith('video/')),
+    ];
     try {
-      for (const [index, file] of pendingFiles.entries()) {
+      for (const [index, file] of uploadQueue.entries()) {
         const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
         const filePath = `${projectId}/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
         const { error: uploadError } = await supabase.storage
@@ -642,14 +683,18 @@ function ProjectFormModal({
                       {media.sort_order === 0 && <span className="dashboard-cover-badge">الغلاف</span>}
                     </div>
                     <div className="flex items-center justify-between gap-2 mt-2">
-                      <button
-                        type="button"
-                        onClick={() => handleSetCover(media)}
-                        disabled={media.sort_order === 0}
-                        className="text-xs font-bold text-[#111111] disabled:opacity-40"
-                      >
-                        {media.sort_order === 0 ? <Check size={14} className="inline ml-1" /> : 'تعيين كغلاف'}
-                      </button>
+                      {media.media_type === 'image' ? (
+                        <button
+                          type="button"
+                          onClick={() => handleSetCover(media)}
+                          disabled={media.sort_order === 0}
+                          className="text-xs font-bold text-[#111111] disabled:opacity-40"
+                        >
+                          {media.sort_order === 0 ? <Check size={14} className="inline ml-1" /> : 'تعيين كغلاف'}
+                        </button>
+                      ) : (
+                        <span className="text-xs font-bold text-[#111111]/45">فيديو</span>
+                      )}
                       <button type="button" onClick={() => handleDeleteMedia(media)} className="text-xs font-bold text-brutal-red">
                         حذف
                       </button>
@@ -674,6 +719,14 @@ function ProjectFormModal({
           </button>
         </div>
       </div>
+
+      {cropFile && (
+        <CoverCropper
+          file={cropFile}
+          onCancel={handleCropCancelled}
+          onConfirm={handleCropConfirmed}
+        />
+      )}
     </div>
   );
 }
