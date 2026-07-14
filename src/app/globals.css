@@ -634,6 +634,30 @@ html[dir="rtl"] .featured-projects-cta:hover {
 
 .project-media-lightbox {
   background: rgba(15, 15, 15, 0.86);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.media-lightbox-toolbar {
+  position: absolute;
+  top: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  padding: 0.4rem 0.7rem;
+  border: 2px solid white;
+  border-radius: 0.5rem;
+  background: rgba(15, 15, 15, 0.72);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.media-lightbox-image {
+  max-width: 90vw;
+  max-height: 90vh;
+  transform-origin: center;
+  transition: transform 0.12s ease-out;
 }
 
 .media-lightbox-close {
@@ -704,6 +728,13 @@ html[dir="rtl"] .featured-projects-cta:hover {
 
 .project-meta-other {
   border-top-color: var(--color-purple-dark);
+}
+
+.project-detail-meta-aside {
+  position: sticky;
+  top: 5.5rem;
+  align-self: start;
+  z-index: 20;
 }
 
 .project-detail-description h2 {
@@ -1089,6 +1120,12 @@ html[dir="rtl"] .featured-projects-cta:hover {
   font-weight: 800;
   white-space: nowrap;
   pointer-events: none;
+}
+
+@media (max-width: 1023px) {
+  .project-detail-meta-aside {
+    position: static;
+  }
 }
 
 @media (max-width: 767px) {

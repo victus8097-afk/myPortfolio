@@ -110,7 +110,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
               )}
             </div>
 
-            <aside className="lg:sticky lg:top-24">
+            <aside className="project-detail-meta-aside">
               <ProjectMetaBox project={project} />
             </aside>
           </div>

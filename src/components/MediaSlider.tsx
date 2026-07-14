@@ -5,7 +5,7 @@
 // Client Component: عرض الوسائط بترتيب الفيديوهات أولاً
 // ============================================================
 
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import type { ProjectMedia } from '@/types';
 import { ChevronLeft, ChevronRight, Play, Pause, X, Maximize2 } from 'lucide-react';
 
@@ -18,8 +18,34 @@ export default function MediaSlider({ media }: MediaSliderProps) {
   const [loadedMediaId, setLoadedMediaId] = useState<number | null>(null);
   const [mediaError, setMediaError] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxZoom, setLightboxZoom] = useState(1);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [lightboxOpen]);
+
+  const openLightbox = () => {
+    setLightboxZoom(1);
+    setLightboxOpen(true);
+  };
+
+  const closeLightbox = () => {
+    setLightboxZoom(1);
+    setLightboxOpen(false);
+  };
+
+  const handleLightboxWheel = (event: React.WheelEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setLightboxZoom((current) => Math.min(4, Math.max(1, current + (event.deltaY < 0 ? 0.2 : -0.2))));
+  };
 
   const orderedMedia = [...media].sort((a, b) => {
     if (a.media_type !== b.media_type) return a.media_type === 'video' ? -1 : 1;
@@ -41,7 +67,7 @@ export default function MediaSlider({ media }: MediaSliderProps) {
     setCurrentIndex(index);
     setIsPlaying(false);
     setMediaError(false);
-    setLightboxOpen(false);
+    closeLightbox();
   };
 
   const goToPrev = () => {
@@ -67,7 +93,7 @@ export default function MediaSlider({ media }: MediaSliderProps) {
             {currentMedia.media_type === 'video' ? 'فيديو' : 'صورة'} — {currentIndex + 1} / {orderedMedia.length}
           </span>
           {currentMedia.media_type === 'image' && !isLoading && !mediaError && (
-            <button type="button" onClick={() => setLightboxOpen(true)} className="text-white/70 hover:text-white" aria-label="تكبير الصورة">
+            <button type="button" onClick={openLightbox} className="text-white/70 hover:text-white" aria-label="تكبير الصورة">
               <Maximize2 size={16} />
             </button>
           )}
@@ -78,7 +104,7 @@ export default function MediaSlider({ media }: MediaSliderProps) {
             <button
               type="button"
               className="w-full h-full cursor-zoom-in disabled:cursor-default"
-              onClick={() => setLightboxOpen(true)}
+onClick={openLightbox}
               disabled={isLoading || mediaError}
             >
               <img
@@ -137,15 +163,24 @@ export default function MediaSlider({ media }: MediaSliderProps) {
       </div>
 
       {lightboxOpen && currentMedia.media_type === 'image' && !mediaError && (
-        <div className="project-media-lightbox fixed inset-0 z-[80] flex items-center justify-center p-4" onClick={() => setLightboxOpen(false)}>
-          <button type="button" onClick={() => setLightboxOpen(false)} className="absolute top-5 right-5 media-lightbox-close" aria-label="إغلاق الصورة">
+        <div
+          className="project-media-lightbox fixed inset-0 z-[80] flex items-center justify-center p-4"
+          onClick={closeLightbox}
+          onWheel={handleLightboxWheel}
+        >
+          <div className="media-lightbox-toolbar">
+            مرّر عجلة الماوس للتكبير — {Math.round(lightboxZoom * 100)}%
+          </div>
+          <button type="button" onClick={closeLightbox} className="absolute top-5 right-5 media-lightbox-close" aria-label="إغلاق الصورة">
             <X size={22} />
           </button>
           <img
             src={currentMedia.media_url}
             alt={`صورة العمل ${currentIndex + 1} بالحجم الكامل`}
-            className="max-w-full max-h-[90vh] object-contain border-4 border-white shadow-[8px_8px_0px_#0F0F0F]"
+            className="media-lightbox-image object-contain border-4 border-white shadow-[8px_8px_0px_#0F0F0F]"
+            style={{ transform: `scale(${lightboxZoom})` }}
             onClick={(event) => event.stopPropagation()}
+            onWheel={handleLightboxWheel}
           />
         </div>
       )}
