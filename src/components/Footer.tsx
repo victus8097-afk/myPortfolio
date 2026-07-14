@@ -24,7 +24,7 @@ export default function Footer() {
           </Link>
 
           <p className="mt-4 max-w-md text-sm leading-7 text-white/50">
-            مطور ويب وتطبيقات، أبني تجارب رقمية واضحة وعملية تجمع بين الفكرة والتصميم.
+            مطور ويب وتطبيقات — أصنع حلولاً رقمية واضحة.
           </p>
         </div>
 
