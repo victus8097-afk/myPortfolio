@@ -121,34 +121,16 @@ export default function DashboardPage() {
   }, [supabase]);
 
   useEffect(() => {
-    let cancelled = false;
-    // التحقق من المصادقة مع مهلة واضحة حتى لا تبقى الصفحة في حالة تحميل دائمة.
-    const checkAuth = async () => {
-      try {
-        const sessionRequest = supabase.auth.getSession();
-        const timeout = new Promise<never>((_, reject) => {
-          window.setTimeout(() => reject(new Error('انتهت مهلة الاتصال بـ Supabase')), 10000);
-        });
-        const { data: { session } } = await Promise.race([sessionRequest, timeout]);
-
-        if (!session) {
-          window.location.href = '/sys-gate-hq-99x';
-          return;
-        }
-        if (!cancelled) await fetchData();
-      } catch (error) {
-        console.error('Dashboard initialization error:', error);
-        if (!cancelled) {
-          setLoadError(error instanceof Error ? error.message : 'تعذر تهيئة لوحة التحكم');
-          setIsLoading(false);
-        }
-      }
+    // حماية المسار تتم في middleware؛ نبدأ جلب البيانات مباشرة حتى لا تبقى الواجهة معلقة بانتظار جلسة العميل.
+    let active = true;
+    const loadDashboard = async () => {
+      if (active) await fetchData();
     };
-    checkAuth();
+    void loadDashboard();
     return () => {
-      cancelled = true;
+      active = false;
     };
-  }, [supabase, fetchData]);
+  }, [fetchData]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
