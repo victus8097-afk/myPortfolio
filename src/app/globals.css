@@ -539,6 +539,18 @@ html[dir="rtl"] .featured-projects-cta:hover {
   padding-top: 1.25rem;
 }
 
+.project-detail-page {
+  background-color: rgba(255, 255, 255, 0.72);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 12px,
+    rgba(15, 15, 15, 0.02) 12px,
+    rgba(15, 15, 15, 0.02) 24px
+  );
+  background-attachment: fixed;
+}
+
 .project-detail-toolbar {
   padding-bottom: 1.25rem;
   border-bottom: 2px solid rgba(15, 15, 15, 0.1);
@@ -581,6 +593,19 @@ html[dir="rtl"] .featured-projects-cta:hover {
 
 .project-detail-header.project-type-other {
   border-right-color: var(--color-purple-dark);
+}
+
+.project-meta-box {
+  border-top-width: 8px;
+  border-top-color: var(--color-sky-dark);
+}
+
+.project-meta-mobile_app {
+  border-top-color: var(--color-warm-dark);
+}
+
+.project-meta-other {
+  border-top-color: var(--color-purple-dark);
 }
 
 .project-detail-description h2 {

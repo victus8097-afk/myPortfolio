@@ -18,7 +18,7 @@ const typeLabels: Record<string, string> = {
 
 export default function ProjectMetaBox({ project }: ProjectMetaBoxProps) {
   return (
-    <div className="brutal-card p-6">
+    <div className={`project-meta-box brutal-card p-6 project-meta-${project.project_type}`}>
       <h3
         className="text-lg font-black text-[#111111] mb-4"
         style={{ fontFamily: 'var(--font-heading)' }}

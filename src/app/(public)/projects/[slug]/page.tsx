@@ -10,8 +10,7 @@ import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
 import ProjectMetaBox from '@/components/ProjectMetaBox';
 import MediaSliderWrapper from '@/components/MediaSliderWrapper';
-import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import BackToPrevious from '@/components/BackToPrevious';
 import type { Project, ProjectMedia } from '@/types';
 
 interface ProjectDetailPageProps {
@@ -87,10 +86,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
       <div className="section-padding pt-28 pb-20">
         <div className="max-w-6xl mx-auto">
           <div className="project-detail-toolbar flex flex-wrap items-center justify-between gap-4 mb-8">
-            <Link href="/projects" className="brutal-btn bg-white text-sm">
-              <ArrowRight size={16} />
-              العودة للمعرض
-            </Link>
+            <BackToPrevious />
             <span className={`project-detail-type ${typeClass}`}>{typeLabel}</span>
           </div>
 

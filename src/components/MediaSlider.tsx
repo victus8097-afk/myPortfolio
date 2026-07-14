@@ -21,8 +21,8 @@ export default function MediaSlider({ media }: MediaSliderProps) {
 
   if (!media || media.length === 0) {
     return (
-      <div className="brutal-card h-64 flex items-center justify-center bg-brutal-gray">
-        <div className="w-16 h-16 rounded-2xl border-3 border-[#111111] bg-white shadow-[4px_4px_0px_#111111]" aria-label="لا توجد وسائط" />
+      <div className="project-media-empty brutal-card h-64 flex items-center justify-center bg-brutal-gray">
+        <p className="text-sm font-bold text-[#111111]/45">لا توجد وسائط مضافة لهذا العمل</p>
       </div>
     );
   }
@@ -51,11 +51,11 @@ export default function MediaSlider({ media }: MediaSliderProps) {
   const currentMedia = media[currentIndex];
 
   return (
-    <div className="relative">
-      {/* إطار شاشة العرض الكرتوني */}
-      <div className="brutal-card overflow-hidden bg-black border-4 border-[#111111] shadow-[6px_6px_0px_#111111] rounded-xl">
+    <div className="project-media-viewer relative">
+      {/* إطار عرض الوسائط */}
+      <div className="project-media-frame brutal-card overflow-hidden bg-black border-4 border-[#111111] shadow-[6px_6px_0px_#111111] rounded-xl">
         {/* شريط العنوان */}
-        <div className="bg-[#111111] px-4 py-2 flex items-center gap-2">
+        <div className="project-media-header bg-[#111111] px-4 py-2 flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-brutal-red border border-[#111111]"></div>
           <div className="w-3 h-3 rounded-full bg-warm border border-[#111111]"></div>
           <div className="w-3 h-3 rounded-full bg-mint border border-[#111111]"></div>
